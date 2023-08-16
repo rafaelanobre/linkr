@@ -39,6 +39,7 @@ const GlobalStyle = createGlobalStyle`
     }
     p{
         font-size: 17px;
+        line-height: 120%;
     }
 `
 

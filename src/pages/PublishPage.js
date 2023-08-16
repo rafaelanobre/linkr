@@ -23,7 +23,7 @@ export default function PublishPage() {
 
 
     return (
-        <>
+        <PageContainer>
             <header>Linkr</header>
             <h1>Timeline</h1>
             <div>
@@ -53,12 +53,28 @@ export default function PublishPage() {
                 </>
             )}
             </PostsList>
-        </>
+        </PageContainer>
     )
 }
+const PageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    padding-top: 1em;
+    margin: auto;
+    gap: 2em;
+    min-height: 100vh;
+    max-width: 100vw;
+`;
 const PostsList = styled.div`
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 1em;
     padding-top: 2em;
+
+    @media screen and (max-width: 768px) {
+        width: 100vw;
+    }
 `
