@@ -11,12 +11,13 @@ export default function PublishPage() {
     useEffect(()=>{
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
         .then(resp =>{
-            console.log(resp);
+            console.log(resp.data);
             if (resp.data.length === 0) alert("There are no posts yet")
             setPosts(resp.data);
             setLoading(false);
         })
-        .catch(error =>{
+        .catch(err =>{
+            console.log(err)
             alert("An error occured while trying to fetch the posts, please refresh the page");
         })
     }, [])
