@@ -55,7 +55,7 @@ export default function SignInPage() {
         </form>
 
         <Link to={`/sign-up`}>
-        First time? Create an account!
+        <p>First time? Create an account!</p>
         </Link>
       </FormContainer>
 
@@ -105,7 +105,19 @@ const LeftContainer = styled.div`
 const FormContainer = styled.div` 
 font-family: 'Oswald', sans-serif;
 color: #fff;
-text-decoration: none;
+
+p{
+color: #fff;
+
+font-family: Lato;
+font-size: 20px;
+font-weight: 400;
+line-height: 24px;
+letter-spacing: 0em;
+text-align: left;
+text-decoration: underline;
+
+}
 width: 37%;
 display: flex;
 flex-direction: column;
