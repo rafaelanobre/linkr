@@ -71,7 +71,13 @@ const PageContainer = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
-  background-color:#484848;
+  background-color:#333333;
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: space-around;
+    }
 `
 
 const LeftContainer = styled.div`
@@ -101,6 +107,24 @@ const LeftContainer = styled.div`
   line-height: 64px;
   text-align: left;
   }
+  @media screen and (max-width: 768px) {
+    padding-top: 5px;
+  padding-left: 1px;
+    width: 100%;
+    height:25%;
+    h1{
+      width: none;
+      font-size: 76px;
+      line-height: 80px;
+      text-align: center;
+    }
+    h2{
+      
+      font-size: 23px;
+      line-height: 34px;
+      text-align: center;
+    }
+    }
   
 `
 
@@ -165,5 +189,30 @@ align-items: center;
 gap: 9px;
 width: 100%;
 border-radius: 5px;
-    }    
+    }  
+    
+    @media screen and (max-width: 768px) {
+      align-items: center;
+      margin-top: 0;
+      padding-left: 18px;
+      justify-content: center;
+      gap: 115px;
+      height:75%;
+       width: 100%;
+    form{
+      height: 55px;
+      font-size: 22px;
+    }
+    input{
+      height: 55px;
+      font-size: 22px;
+    }
+    button{
+      width: calc(85% - 10px);
+    }
+    p{
+      padding-top: 1px;
+    }
+    }
+
   `

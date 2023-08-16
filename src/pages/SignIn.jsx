@@ -28,7 +28,6 @@ export default function SignInPage() {
     console.log(cadastro)
     cadastro.then((x) => {
       setBtstats(false)
-      console.log(x.data)
       navigate('/timeline')
     })
     cadastro.catch(erro => {
@@ -69,7 +68,13 @@ const PageContainer = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
-  background-color:#484848;
+  background-color:#333333;
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: space-around;
+    }
 `
 
 const LeftContainer = styled.div`
@@ -99,12 +104,37 @@ const LeftContainer = styled.div`
   line-height: 64px;
   text-align: left;
   }
+  @media screen and (max-width: 768px) {
+    padding-top: 5px;
+  padding-left: 1px;
+    width: 100%;
+    height:25%;
+    h1{
+      width: none;
+      font-size: 76px;
+      line-height: 80px;
+      text-align: center;
+    }
+    h2{
+      
+      font-size: 23px;
+      line-height: 34px;
+      text-align: center;
+    }
+    }
   
 `
 
 const FormContainer = styled.div` 
 font-family: 'Oswald', sans-serif;
 color: #fff;
+width: 37%;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+font-size: 24px;
+gap: 12px;
 
 p{
 color: #fff;
@@ -118,13 +148,7 @@ text-align: left;
 text-decoration: underline;
 
 }
-width: 37%;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-font-size: 24px;
-gap: 12px;
+
 button {
 font-family: 'Oswald', sans-serif;
 display: flex;
@@ -167,5 +191,27 @@ align-items: center;
 gap: 9px;
 width: 100%;
 border-radius: 5px;
-    }    
+    }      
+    @media screen and (max-width: 768px) {
+      padding-top: 100px;
+      padding-left: 18px;
+      justify-content: start;
+      gap: 60px;
+   height:75%;
+    width: 100%;
+    form{
+      height: 55px;
+      font-size: 22px;
+    }
+    input{
+      height: 55px;
+      font-size: 22px;
+    }
+    button{
+      width: calc(85% - 10px);
+    }
+    p{
+      padding-top: 1px;
+    }
+    }
   `
