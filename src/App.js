@@ -7,7 +7,7 @@ export default function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/posts" element={<PublishPage />} />
+          <Route path="/timeline" element={<PublishPage />} />
         </Routes>
       </BrowserRouter>
     </>

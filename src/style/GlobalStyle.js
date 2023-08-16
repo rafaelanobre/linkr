@@ -10,6 +10,7 @@ const GlobalStyle = createGlobalStyle`
 
         html, body, #root {
         min-height: 100vh;
+        color: #ffffff;
     }
 
     body {
@@ -20,6 +21,24 @@ const GlobalStyle = createGlobalStyle`
         align-items: center;
         background-color: #333333;
         overflow-x: hidden;
+    }
+    h1{
+
+    }
+    h2{
+
+    }
+    h3{
+
+    }
+    h4{
+
+    }
+    h5{
+        font-size: 19px;
+    }
+    p{
+        font-size: 17px;
     }
 `
 
