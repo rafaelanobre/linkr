@@ -57,7 +57,7 @@ export default function SignUpPage() {
         </form>
 
         <Link to={`/`}>
-          Switch back to log in
+          <p>Switch back to log in</p>
         </Link>
       </SingUpContainer>
 
@@ -105,9 +105,7 @@ const LeftContainer = styled.div`
 `
 
 const SingUpContainer = styled.div` 
-font-family: 'Oswald', sans-serif;
-color: #fff;
-text-decoration: none;
+
 width: 37%;
 display: flex;
 flex-direction: column;
@@ -115,6 +113,16 @@ justify-content: center;
 align-items: center;
 font-size: 24px;
 gap: 12px;
+p{
+color: #fff;
+text-decoration: underline;
+font-family: Lato;
+font-size: 20px;
+font-weight: 400;
+line-height: 24px;
+letter-spacing: 0em;
+text-align: left;
+}
 button {
 font-family: 'Oswald', sans-serif;
 display: flex;

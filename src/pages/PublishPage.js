@@ -7,6 +7,28 @@ import Post from '../components/Post';
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [link, setLink] = useState('');
+    const [description, setDescription] = useState('');
+    const [isDisabled, setIsDisabled] = useState(false);
+
+    const handlePublish = () => {
+        if (!link) return alert("Please enter a link before publishing!");
+
+        setIsDisabled(true);
+
+        axios.post(`${process.env.REACT_APP_API_URL}/posts`, { link, description })
+            .then(resp => {
+                setPosts([resp.data, ...posts]);
+
+                setLink('');
+                setDescription('');
+                setIsDisabled(false);
+            })
+            .catch(error => {
+                alert("An error occurred while trying to publish the post");
+                setIsDisabled(false);
+            });
+    };
 
     useEffect(()=>{
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
@@ -29,8 +51,22 @@ export default function PublishPage() {
             <h1>Timeline</h1>
             <div>
                 <h3>What are you going to share today?</h3>
-                <input type="text" label="Link" required></input>
-                <input type="text" label="Descrição"></input>
+                <input 
+                    type="text" 
+                    label="Link" 
+                    onChange={e => setLink(e.target.value)} 
+                    disabled={isDisabled}
+                    placeholder="http://..."
+                    required 
+                ></input>
+                <input 
+                    type="text" 
+                    label="Descrição" 
+                    onChange={e => setDescription(e.target.value)}
+                    disabled={isDisabled}
+                    placeholder="Awesome article about #javascript"
+                ></input>
+                <button onClick={handlePublish}>Publish</button>
                 <button>Publish</button>
             </div>
 
