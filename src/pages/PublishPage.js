@@ -1,8 +1,9 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components'
 import Post from '../components/Post';
+import { UserContext } from '../Context/Context';
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -11,36 +12,17 @@ export default function PublishPage() {
     const [description, setDescription] = useState('');
     const [isDisabled, setIsDisabled] = useState(false);
 
-    const handlePublish = () => {
-        if (!link) return alert("Please enter a link before publishing!");
+    const { user } = useContext(UserContext);
+    const { token } = user;
+    const config = {
+        headers: {
+            Authorization:`Bearer ${token}`
+        }
+    }
 
-        setIsDisabled(true);
-
-        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url: link, description }, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(resp => {
-                setPosts([resp.data, ...posts]);
-
-                setLink('');
-                setDescription('');
-                setIsDisabled(false);
-            })
-            .catch(error => {
-                console.log("Error while trying to publish the post:", error);
-                alert("An error occurred while trying to publish the post");
-                setIsDisabled(false);
-            });
-            
-            
-    };
-
-    useEffect(()=>{
+    const fetchPosts = () => {
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
         .then(resp =>{
-            console.log(resp);
             if (resp.data.length === 0) alert("There are no posts yet")
             setPosts(resp.data);
             setLoading(false);
@@ -48,6 +30,28 @@ export default function PublishPage() {
         .catch(error =>{
             alert("An error occured while trying to fetch the posts, please refresh the page");
         })
+    }
+
+    const handlePublish = () => {
+        if (!link) return alert("Please enter a link before publishing!");
+
+        setIsDisabled(true);
+
+        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url:link, description }, config)
+            .then(resp => {
+                setLink('');
+                setDescription('');
+                setIsDisabled(false);
+                fetchPosts();
+            })
+            .catch(error => {
+                alert("An error occurred while trying to publish the post");
+                setIsDisabled(false);
+            });
+    };
+
+    useEffect(()=>{
+        fetchPosts();
     }, [])
 
 
