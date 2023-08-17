@@ -60,6 +60,7 @@ export default function PublishPage() {
                 <input 
                     type="text" 
                     label="Link" 
+                    value={link}
                     onChange={e => setLink(e.target.value)} 
                     disabled={isDisabled}
                     placeholder="http://..."
@@ -68,6 +69,7 @@ export default function PublishPage() {
                 <input 
                     type="text" 
                     label="Descrição" 
+                    value={description}
                     onChange={e => setDescription(e.target.value)}
                     disabled={isDisabled}
                     placeholder="Awesome article about #javascript"
