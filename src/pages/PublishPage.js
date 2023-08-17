@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { TailSpin } from 'react-loader-spinner';
-import { styled } from 'styled-components'
+import styled from 'styled-components'
 import Post from '../components/Post';
 
 export default function PublishPage() {
@@ -16,7 +16,11 @@ export default function PublishPage() {
 
         setIsDisabled(true);
 
-        axios.post(`${process.env.REACT_APP_API_URL}/posts`, { link, description })
+        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url: link, description }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(resp => {
                 setPosts([resp.data, ...posts]);
 
@@ -25,9 +29,12 @@ export default function PublishPage() {
                 setIsDisabled(false);
             })
             .catch(error => {
+                console.log("Error while trying to publish the post:", error);
                 alert("An error occurred while trying to publish the post");
                 setIsDisabled(false);
             });
+            
+            
     };
 
     useEffect(()=>{
@@ -53,6 +60,7 @@ export default function PublishPage() {
                 <input 
                     type="text" 
                     label="Link" 
+                    value={link}
                     onChange={e => setLink(e.target.value)} 
                     disabled={isDisabled}
                     placeholder="http://..."
@@ -61,12 +69,12 @@ export default function PublishPage() {
                 <input 
                     type="text" 
                     label="Descrição" 
+                    value={description}
                     onChange={e => setDescription(e.target.value)}
                     disabled={isDisabled}
                     placeholder="Awesome article about #javascript"
                 ></input>
                 <button onClick={handlePublish}>Publish</button>
-                <button>Publish</button>
             </div>
 
             <PostsList>

@@ -1,8 +1,10 @@
 import React from 'react';
-import { styled } from 'styled-components';
+import styled from 'styled-components'; // Retirei os {} da importação
 import { likeIcon, likedIcon, editIcon, deleteIcon } from '../images/IconsIndex';
 
 export default function Post({ post }){
+    const metadata = post.metadata || {};
+
     return (
         <PostDiv>
             <LeftContent>
@@ -23,16 +25,17 @@ export default function Post({ post }){
                     window.open(post.url, '_blank')
                 }}>
                     <MetadadosText>
-                        <p>{post.metadata['og:title']}</p>
-                        <p>{post.metadata['og:description']}</p>
+                        <p>{metadata['og:title']}</p> 
+                        <p>{metadata['og:description']}</p> 
                         <p>{post.url}</p>
                     </MetadadosText>
-                    <img src={post.metadata['og:image']} alt='URL Preview' />
+                    <img src={metadata['og:image']} alt='URL Preview' /> 
                 </Metadados>
             </MainContent>
         </PostDiv>
     );
 };
+
 
 const IconsDiv = styled.div``;
 const Icon = styled.img``;
