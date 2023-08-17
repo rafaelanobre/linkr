@@ -4,6 +4,7 @@ import SignUpPage from "./pages/SignUp";
 import SignInPage from "./pages/SignIn";
 import { UserContext } from "./Context/Context";
 import { useState } from "react";
+import PostByUser from "./pages/PostsByUser";
 
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/timeline" element={<PublishPage />} />
             <Route path="/sign-up" element={<SignUpPage />} />
             <Route path="/" element={<SignInPage />} />
+            <Route path="/user/:id" element={<PostByUser />} />
           </Routes>
         </UserContext.Provider>
       </BrowserRouter>
