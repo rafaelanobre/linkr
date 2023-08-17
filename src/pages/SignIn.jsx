@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react";
 import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
+import { UserContext } from '../Context/Context';
 
 export default function SignInPage() {
-  const [formNewUser, setFormNewUser] = useState({ email: '', password: ''})
+  const [formNewUser, setFormNewUser] = useState({ email: '', password: '' })
   const [btstats, setBtstats] = useState(false)
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate()
 
   const updateFormNewUser = (e) => {
@@ -25,9 +26,10 @@ export default function SignInPage() {
     const cadastro = axios.post(`${process.env.REACT_APP_API_URI}/`,
       formNewUser
     )
-    console.log(cadastro)
+
     cadastro.then((x) => {
       setBtstats(false)
+      setUser(x.data)
       navigate('/timeline')
     })
     cadastro.catch(erro => {
@@ -54,7 +56,7 @@ export default function SignInPage() {
         </form>
 
         <Link to={`/sign-up`}>
-        <p>First time? Create an account!</p>
+          <p>First time? Create an account!</p>
         </Link>
       </FormContainer>
 
