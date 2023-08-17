@@ -1,22 +1,22 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
-import {
-  likeIcon,
-  likedIcon,
-  editIcon,
-  deleteIcon,
-} from "../images/IconsIndex";
+import { likeIcon, likedIcon, editIcon, deleteIcon,} from "../images/IconsIndex";
 import postservices from "../services/post.service";
+import { useContext } from "react";
+import { UserContext } from "../Context/Context";
 
 
 
 
 export default function Post({ post }){
+    const {user} = useContext(UserContext)
     const [iconelike, setIconelike] = useState(0);
+    console.log(post)
 
     function formatNames(names){
-      
-      const shownNames = names.slice(-2).join(', ')
+      const maxShown = 2;
+    
+      const shownNames = names.slice(-maxShown).join(', ')
       if (names.length > 2) {
         const remainingCount = names.length - 2;
         return `Curtido por ${shownNames} e mais ${remainingCount} pessoa${remainingCount > 1 ? 's' : ''}`;
@@ -29,7 +29,7 @@ export default function Post({ post }){
     
     function darLike(body) {
       const likes = iconelike === 0 ? 1 : 0
-  
+      console.log(user)
       //falta colocar no body o id do usuario que esta logado
       if(likes === 1){
           console.log('post')
@@ -47,13 +47,13 @@ export default function Post({ post }){
         <PostDiv>
             <LeftContent>
                 <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
-                <Likes>
+                 <Likes>
           <div onClick={()=> darLike(post.postId)}>
           <Icon src={iconelike === 0 ? likeIcon : likedIcon} alt="Curtir" 
           title={formatNames(post.usersLikedNames)}/>
           <p>{post.usersLikedNames.length + iconelike}</p>
           </div>
-        </Likes>
+        </Likes> 
             </LeftContent>
             <MainContent>
                 <div>
@@ -64,7 +64,7 @@ export default function Post({ post }){
                     </IconsDiv>
                 </div>
                 <p>{post.description}</p>
-                <Metadados onClick={() => {
+                 <Metadados onClick={() => {
                     window.open(post.url, '_blank')
                 }}>
                     <MetadadosText>
@@ -73,7 +73,7 @@ export default function Post({ post }){
                         <p>{post.url}</p>
                     </MetadadosText>
                     <img src={post.metadata['og:image']} alt='URL Preview' />
-                </Metadados>
+                </Metadados> 
             </MainContent>
         </PostDiv>
     );
