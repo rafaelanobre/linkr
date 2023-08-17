@@ -48,15 +48,15 @@ export default function SignUpPage() {
       </LeftContainer>
       <SingUpContainer>
         <form onSubmit={sendsignup}>
-          <input disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
-          <input disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
-          <input disabled={btstats} placeholder="username" type="text" id="name" required value={formNewUser['name']} onChange={updateFormNewUser} />
-          <input disabled={btstats} placeholder="picture url" type="url" id="photo" value={formNewUser['photo']} onChange={updateFormNewUser} />
+          <input data-test="email" disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
+          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
+          <input data-test="username" disabled={btstats} placeholder="username" type="text" id="name" required value={formNewUser['name']} onChange={updateFormNewUser} />
+          <input data-test="picture-url" disabled={btstats} placeholder="picture url" type="url" id="photo" value={formNewUser['photo']} onChange={updateFormNewUser} />
 
-          {btstats ? <button disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button disabled={btstats} type="submit">Sign Up</button>}
+          {btstats ? <button data-test="sign-up-btn" disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button data-test="sign-up-btn" disabled={btstats} type="submit">Sign Up</button>}
         </form>
 
-        <Link to={`/`}>
+        <Link data-test="login-link" to={`/`}>
           <p>Switch back to log in</p>
         </Link>
       </SingUpContainer>
