@@ -1,14 +1,13 @@
-import React, { useContext, useState } from 'react'
+import React from 'react'
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom"
+import { useState } from "react";
 import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
-import { UserContext } from '../Context/Context';
 
 export default function SignInPage() {
-  const [formNewUser, setFormNewUser] = useState({ email: '', password: '' })
+  const [formNewUser, setFormNewUser] = useState({ email: '', password: ''})
   const [btstats, setBtstats] = useState(false)
-  const { setUser } = useContext(UserContext);
   const navigate = useNavigate()
 
   const updateFormNewUser = (e) => {
@@ -22,14 +21,14 @@ export default function SignInPage() {
 
     setBtstats(true);
 
-    console.log(formNewUser)
     const cadastro = axios.post(`${process.env.REACT_APP_API_URI}/`,
       formNewUser
     )
-
+    
     cadastro.then((x) => {
       setBtstats(false)
-      setUser(x.data)
+      const productJSON = JSON.stringify(x.data); 
+      sessionStorage.setItem("User", productJSON)
       navigate('/timeline')
     })
     cadastro.catch(erro => {
@@ -49,14 +48,14 @@ export default function SignInPage() {
       </LeftContainer>
       <FormContainer>
         <form onSubmit={sendsignin}>
-          <input disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
-          <input disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
+          <input data-test="email" disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
+          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
 
-          {btstats ? <button disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button disabled={btstats} type="submit">Log In</button>}
+          {btstats ? <button data-test="login-btn" disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button data-test="login-btn" disabled={btstats} type="submit">Log In</button>}
         </form>
 
-        <Link to={`/sign-up`}>
-          <p>First time? Create an account!</p>
+        <Link data-test="sign-up-link" to={`/sign-up`}>
+        <p>First time? Create an account!</p>
         </Link>
       </FormContainer>
 

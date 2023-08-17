@@ -1,8 +1,9 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { TailSpin } from 'react-loader-spinner';
-import { styled } from 'styled-components'
+import styled from 'styled-components'
 import Post from '../components/Post';
+import { UserContext } from '../Context/Context';
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -11,12 +12,20 @@ export default function PublishPage() {
     const [description, setDescription] = useState('');
     const [isDisabled, setIsDisabled] = useState(false);
 
+    console.log(UserContext);
+    const { token } = useContext(UserContext);
+    const config = {
+        headers: {
+            Authorization:`Bearer ${token}`
+        }
+    }
+
     const handlePublish = () => {
         if (!link) return alert("Please enter a link before publishing!");
 
         setIsDisabled(true);
 
-        axios.post(`${process.env.REACT_APP_API_URL}/posts`, { link, description })
+        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { link, description }, config)
             .then(resp => {
                 setPosts([resp.data, ...posts]);
 
@@ -53,6 +62,7 @@ export default function PublishPage() {
                 <input 
                     type="text" 
                     label="Link" 
+                    value={link}
                     onChange={e => setLink(e.target.value)} 
                     disabled={isDisabled}
                     placeholder="http://..."
@@ -61,12 +71,12 @@ export default function PublishPage() {
                 <input 
                     type="text" 
                     label="Descrição" 
+                    value={description}
                     onChange={e => setDescription(e.target.value)}
                     disabled={isDisabled}
                     placeholder="Awesome article about #javascript"
                 ></input>
                 <button onClick={handlePublish}>Publish</button>
-                <button>Publish</button>
             </div>
 
             <PostsList>

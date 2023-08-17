@@ -110,8 +110,17 @@ export default function Post({ post }) {
             <Icon src={deleteIcon} alt="Deletar" />
           </IconsDiv>
         </div>
-        <p>{post.description}</p>
-        <div>
+        <p>{post.description}{' '}
+                    {post.hashtags.length > 0 &&
+                        post.hashtags.map((hashtag, index) => (
+                        <React.Fragment key={hashtag.hashtagId}>
+                            <Link to={`/hashtag/${hashtag.hashtag}`}>
+                                <Tag>#{hashtag.hashtag}</Tag>
+                            </Link>
+                            {index !== post.hashtags.length - 1 && ' '}
+                        </React.Fragment>
+                        ))}
+                </p>
           {post.Metadados ? (
             <Metadados
               onClick={() => {
@@ -128,12 +137,16 @@ export default function Post({ post }) {
           ) : (
             ""
           )}
-        </div>
       </MainContent>
     </PostDiv>
   );
 }
 const Likes = styled.div``;
+const Tag = styled.a`
+    font-weight: 600;
+    color: #fff;
+    text-decoration: underline #171717;
+`
 const IconsDiv = styled.div``;
 const Icon = styled.img``;
 const LeftContent = styled.div``;
