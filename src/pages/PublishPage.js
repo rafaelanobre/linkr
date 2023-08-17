@@ -12,12 +12,24 @@ export default function PublishPage() {
     const [description, setDescription] = useState('');
     const [isDisabled, setIsDisabled] = useState(false);
 
-    console.log(UserContext);
-    const { token } = useContext(UserContext);
+    const { user } = useContext(UserContext);
+    const { token } = user;
     const config = {
         headers: {
             Authorization:`Bearer ${token}`
         }
+    }
+
+    const fetchPosts = () => {
+        axios.get(`${process.env.REACT_APP_API_URI}/posts`)
+        .then(resp =>{
+            if (resp.data.length === 0) alert("There are no posts yet")
+            setPosts(resp.data);
+            setLoading(false);
+        })
+        .catch(error =>{
+            alert("An error occured while trying to fetch the posts, please refresh the page");
+        })
     }
 
     const handlePublish = () => {
@@ -25,13 +37,12 @@ export default function PublishPage() {
 
         setIsDisabled(true);
 
-        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { link, description }, config)
+        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url:link, description }, config)
             .then(resp => {
-                setPosts([resp.data, ...posts]);
-
                 setLink('');
                 setDescription('');
                 setIsDisabled(false);
+                fetchPosts();
             })
             .catch(error => {
                 alert("An error occurred while trying to publish the post");
@@ -40,16 +51,7 @@ export default function PublishPage() {
     };
 
     useEffect(()=>{
-        axios.get(`${process.env.REACT_APP_API_URI}/posts`)
-        .then(resp =>{
-            console.log(resp);
-            if (resp.data.length === 0) alert("There are no posts yet")
-            setPosts(resp.data);
-            setLoading(false);
-        })
-        .catch(error =>{
-            alert("An error occured while trying to fetch the posts, please refresh the page");
-        })
+        fetchPosts();
     }, [])
 
 
