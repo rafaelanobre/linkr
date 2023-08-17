@@ -7,8 +7,9 @@ import { useState } from "react";
 
 
 export default function App() {
-
   const [user, setUser] = useState();
+  const local = sessionStorage.getItem("User")
+  if(!user && local ) setUser(JSON.parse(local))
 
   return (
     <>
