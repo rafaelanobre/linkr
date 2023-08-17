@@ -21,7 +21,6 @@ export default function SignUpPage() {
 
     setBtstats(true);
 
-    console.log(formNewUser)
     const cadastro = axios.post(`${process.env.REACT_APP_API_URI}/sign-up`,
       formNewUser
     )
