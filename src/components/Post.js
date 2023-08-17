@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import { likeIcon, likedIcon, editIcon, deleteIcon } from '../images/IconsIndex';
+import { Link } from'react-router-dom';
 
 export default function Post({ post }){
     return (
@@ -18,7 +19,18 @@ export default function Post({ post }){
                         <Icon src={deleteIcon} alt='Deletar' />
                     </IconsDiv>
                 </div>
-                <p>{post.description}</p>
+                <p>
+                    {post.description}{' '}
+                    {post.hashtags.length > 0 &&
+                        post.hashtags.map((hashtag, index) => (
+                        <React.Fragment key={hashtag.hashtagId}>
+                            <Link to={`/hashtag/${hashtag.hashtag}`}>
+                                <Tag>#{hashtag.hashtag}</Tag>
+                            </Link>
+                            {index !== post.hashtags.length - 1 && ' '}
+                        </React.Fragment>
+                        ))}
+                </p>
                 <Metadados onClick={() => {
                     window.open(post.url, '_blank')
                 }}>
@@ -33,7 +45,11 @@ export default function Post({ post }){
         </PostDiv>
     );
 };
-
+const Tag = styled.a`
+    font-weight: 600;
+    color: #fff;
+    text-decoration: underline #171717;
+`
 const IconsDiv = styled.div``;
 const Icon = styled.img``;
 const LeftContent = styled.div``;
