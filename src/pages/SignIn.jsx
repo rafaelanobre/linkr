@@ -21,13 +21,14 @@ export default function SignInPage() {
 
     setBtstats(true);
 
-    console.log(formNewUser)
     const cadastro = axios.post(`${process.env.REACT_APP_API_URI}/`,
       formNewUser
     )
-    console.log(cadastro)
+    
     cadastro.then((x) => {
       setBtstats(false)
+      const productJSON = JSON.stringify(x.data); 
+      sessionStorage.setItem("User", productJSON)
       navigate('/timeline')
     })
     cadastro.catch(erro => {
@@ -47,13 +48,13 @@ export default function SignInPage() {
       </LeftContainer>
       <FormContainer>
         <form onSubmit={sendsignin}>
-          <input disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
-          <input disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
+          <input data-test="email" disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
+          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
 
-          {btstats ? <button disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button disabled={btstats} type="submit">Log In</button>}
+          {btstats ? <button data-test="login-btn" disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button data-test="login-btn" disabled={btstats} type="submit">Log In</button>}
         </form>
 
-        <Link to={`/sign-up`}>
+        <Link data-test="sign-up-link" to={`/sign-up`}>
         <p>First time? Create an account!</p>
         </Link>
       </FormContainer>
