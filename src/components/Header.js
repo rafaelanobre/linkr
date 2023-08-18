@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
     const [showLogout, setShowLogout] = useState(false);
+    const navigate = useNavigate();
+
+    const LogOut = () => {
+        localStorage.clear();
+        navigate("/");
+    }
 
     return (
         <HeaderDiv>
@@ -11,7 +18,7 @@ export default function Header() {
             <Profile>
                 <LogoutButton onClick={() => setShowLogout(!showLogout)}>{showLogout ? '▲' : '▼'}</LogoutButton>
                 <ProfileImage src="URL-da-imagem-do-usuario" alt="User profile" />
-                {showLogout && <LogoutOption onClick={() => {/* Inserir a função/lógica de logout */}}>Logout</LogoutOption>}
+                {showLogout && <LogoutOption onClick={() => LogOut()}>Logout</LogoutOption>}
             </Profile>
         </HeaderDiv>
     )
