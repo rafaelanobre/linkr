@@ -26,7 +26,7 @@ export default function Post({ post }){
                     {post.hashtags.length > 0 &&
                         post.hashtags.map((hashtag, index) => (
                         <React.Fragment key={hashtag.hashtagId}>
-                            <Link to={`/hashtag/${hashtag.hashtag}`}>
+                            <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
                                 <Tag>#{hashtag.hashtag}</Tag>
                             </Link>
                             {index !== post.hashtags.length - 1 && ' '}
@@ -37,11 +37,11 @@ export default function Post({ post }){
                     window.open(post.url, '_blank')
                 }}>
                     <MetadadosText>
-                        <p>{metadata['og:title']}</p> 
-                        <p>{metadata['og:description']}</p> 
+                        <p>{metadata.title}</p> 
+                        <p>{metadata.description}</p> 
                         <p>{post.url}</p>
                     </MetadadosText>
-                    <img src={metadata['og:image']} alt='URL Preview' /> 
+                    <img src={metadata.image} alt='URL Preview' /> 
                 </Metadados>
             </MainContent>
         </PostDiv>
