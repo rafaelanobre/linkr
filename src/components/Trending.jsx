@@ -5,21 +5,21 @@ export default function TrendingHashtags({trendingHashtags}){
 
     return(
         <AsideContent>
-                <div>
-                    <h3>trending</h3>
-                </div>
-                {trendingHashtags.length === 0 ? (
-                    <p>There are no hashtags yet</p>
-                ) : (
-                    <>
-                        {trendingHashtags.map((hashtag) => (
-                            <Link to={`/hashtag/${hashtag.hashtag}`}>
-                                <p key={hashtag.id}>#{hashtag.hashtag}</p>
-                            </Link>
-                        ))}
-                    </>
-                )}
-            </AsideContent>
+            <div>
+                <h3>trending</h3>
+            </div>
+            {trendingHashtags.length === 0 ? (
+                <p>There are no hashtags yet</p>
+            ) : (
+                <>
+                    {trendingHashtags.map((hashtag) => (
+                        <Link key={hashtag.id} to={`/hashtag/${hashtag.hashtag}`} state={ hashtag }>
+                            <p>#{hashtag.hashtag}</p>
+                        </Link>
+                    ))}
+                </>
+            )}
+        </AsideContent>
     )
 }
 const AsideContent = styled.div`
