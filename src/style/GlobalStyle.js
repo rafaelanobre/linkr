@@ -23,13 +23,19 @@ const GlobalStyle = createGlobalStyle`
         overflow-x: hidden;
     }
     h1{
-
+        font-family: Oswald;
+        font-size: 2.7em;
+        font-weight: 700;
+        padding-bottom: 1em;
+        padding-top: 1em;
     }
     h2{
 
     }
     h3{
-
+        font-family: Oswald;
+        font-size: 1.7em;
+        font-weight: 700;
     }
     h4{
 
