@@ -4,18 +4,23 @@ import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components'
 import Post from '../components/Post';
 import TrendingHashtags from '../components/Trending';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 export default function HashtagPage(){
     const [posts, setPosts] = useState([]);
     const [trendingHashtags, setTrendingHashtags] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const {hashtag} = useParams();
+
     let { state } = useLocation();
-    const hashtag = state;
+    const tag = state;
 
     const fetchPosts = ()=>{
-        axios.get(`${process.env.REACT_APP_API_URI}/hashtag/${hashtag.id}`)
+        if(!tag || !tag.id){
+            return setLoading(false);
+        }
+        axios.get(`${process.env.REACT_APP_API_URI}/hashtag/${tag.id}`)
         .then(resp =>{
             if (resp.data.length === 0) alert("There are no posts yet")
             setPosts(resp.data);
@@ -39,11 +44,11 @@ export default function HashtagPage(){
     useEffect(()=>{
         fetchPosts();
         fetchTrending();
-    }, [hashtag])
+    }, [tag])
 
     return(
         <>
-        <h1>#{hashtag.hashtag}</h1>
+        <h1>{tag ? `#${tag.hashtag}` : `#${hashtag}`}</h1>
         <PageContainer>
             <MainContent>
                 <PostsList>
@@ -55,7 +60,7 @@ export default function HashtagPage(){
                     ) : (
                     <>
                         {posts.length === 0 ? (
-                            <p>There are no posts yet</p>
+                            <p>There are no posts with this hashtag yet</p>
                         ) : (
                         <>
                             {posts.map((post) => (
