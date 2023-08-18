@@ -10,45 +10,85 @@ import postservices from "../services/post.service";
 import { useContext } from "react";
 import { UserContext } from "../Context/Context";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Post({ post }) {
   const { user } = useContext(UserContext);
-  const [iconelike, setIconelike] = useState(0);
+  const [names, setNames] = useState(post.usersLikedNames);
+  const [likes, setLikes] = useState(
+    post.usersLikedNames[0] === null ? " " : post.usersLikedNames.length
+  );
+  const [showName, setshowName] = useState([])
+
+  useEffect(() => {
+    const altername = formatNames(names); // Calcula o showName com base no estado atualizado
+    setshowName(altername);
+  }, []);
 
   function formatNames(names) {
     
-    const maxShown = 2;
-    const shownNames = names.slice(-maxShown).join(", ");
-    if (names.length > 2) {
-      const remainingCount = names.length - 2;
-      return `Curtido por ${shownNames} e mais ${remainingCount} pessoa${
-        remainingCount > 1 ? "s" : ""
-      }`;
+    if (names[1] === user.name  && names[0] === null) {
+      return "voce curtiu";
     }
-    console.log(names)
-    if(names[0] === null) return '';
+    if (names[0] === null) {
+      return "";
+    }
+    if (names.length === 0) {
+      return "";
+    }
+  
+    const userHasLiked = names.includes(user.name);
+    const likeCount = names.length;
+  
+    if (likeCount === 1) {
+      if (userHasLiked) {
+        return `Curtido por você`;
+      } else {
+        return `Curtido por ${names[0]}`;
+      }
+    }
+  
+    const otherPeopleLiked = userHasLiked ? likeCount - 1 : likeCount;
+  
+    if (otherPeopleLiked === 1) {
+      return `Curtido por você e ${names.filter((nome) => nome !== user.name).join(", ")}`;
+    }
+  
     return `Curtido por ${names}`;
   }
+  
 
   function darLike(postId) {
-    const likes = iconelike === 0 ? 1 : 0;
-    const body ={
-        postId,
-        userliked: user.id
-    }
-    //falta colocar no body o id do usuario que esta logado
-    if (likes === 1) {
-      postservices.likepost(body)
-      .then(res => console.log(res.data))
-      .catch(err => console.log(err.response.data))
-    } else {
-      postservices.deslike(body)
-      .then(res => console.log(res.data))
-      .catch(err => console.log(err.response.data))
-    }
+    const body = {
+      postId,
+      userliked: user.id,
+    };
 
-    setIconelike(likes);
-  }
+    if (names.includes(user.name)) {
+      postservices
+        .deslike(body)
+        .then((res) => {
+          const nameDelete = names.filter((nome) => nome !== user.name);
+          setNames(nameDelete);
+          setLikes(likes - 1);
+          const altername = formatNames(nameDelete)
+          setshowName(altername)
+        })
+        .catch((err) => console.log(err.response.data));
+    } else {
+      postservices
+        .likepost(body)
+        .then((res) => {
+          const newName = [...names, user.name];
+          setNames(newName);
+          setLikes(likes + 1);
+          const altername = formatNames(newName)
+          setshowName(altername)
+        })
+        .catch((err) => console.log(err.response.data));
+    }
+   }
 
   return (
     <PostDiv>
@@ -56,50 +96,38 @@ export default function Post({ post }) {
         <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
 
         <div>
-          {post.usersLikedNames ? (
-            <Likes>
-              <div onClick={() => darLike(post.postId, user.id)}>
-                {post.usersLikedNames.includes(user.name)? 
-                (
-                  <Icon
+          <Likes>
+            <div onClick={() => darLike(post.postId, user.id)}>
+              {names.includes(user.name) ? (
+                <Icon
                   src={likedIcon}
                   alt="Curtir"
                   data-tooltip-id={post.postId}
                 />
-                ):
-                ( <Icon
+              ) : (
+                <Icon
                   src={likeIcon}
                   alt="Curtir"
                   data-tooltip-id={post.postId}
-                />)}
-               
-                <ReactTooltip 
-                id={post.postId} 
-                place="bottom" 
-                content={formatNames(post.usersLikedNames)}
+                />
+              )}
+              
+              <ReactTooltip
+                key={showName}
+                id={post.postId}
+                place="bottom"
+                content={showName}
                 style={{
-                  width: '  ',
-                  backgroundColor: '#FFFFFFE5', // Cor de fundo
-                  color: 'black', // Cor do texto
-                  padding: '8px', // Espaçamento interno
-                  borderRadius: '4px', // Borda arredondada
-                  fontSize: '12px', // Tamanho da fonte
+                  backgroundColor: "#FFFFFFE5", // Cor de fundo
+                  color: "black", // Cor do texto
+                  padding: "8px", // Espaçamento interno
+                  borderRadius: "4px", // Borda arredondada
+                  fontSize: "12px", // Tamanho da fonte
                 }}
-                />
-                {post.usersLikedNames ? (<p>{post.usersLikedNames.length}</p>):(<p>0</p>)}
-               
-              </div>
-            </Likes>
-          ) : (
-            <Likes>
-              <div onClick={() => darLike(post.postId)}>
-                <Icon
-                  src={iconelike === 0 ? likeIcon : likedIcon}
-                  alt="Curtir"
-                />
-              </div>
-            </Likes>
-          )}
+              />
+              <p>{likes}</p>
+            </div>
+          </Likes>
         </div>
       </LeftContent>
       <MainContent>
@@ -110,43 +138,44 @@ export default function Post({ post }) {
             <Icon src={deleteIcon} alt="Deletar" />
           </IconsDiv>
         </div>
-        <p>{post.description}{' '}
-                    {post.hashtags.length > 0 &&
-                        post.hashtags.map((hashtag, index) => (
-                        <React.Fragment key={hashtag.hashtagId}>
-                            <Link to={`/hashtag/${hashtag.hashtag}`}>
-                                <Tag>#{hashtag.hashtag}</Tag>
-                            </Link>
-                            {index !== post.hashtags.length - 1 && ' '}
-                        </React.Fragment>
-                        ))}
-                </p>
-          {post.Metadados ? (
-            <Metadados
-              onClick={() => {
-                window.open(post.url, "_blank");
-              }}
-            >
-              <MetadadosText>
-                <p>{post.metadata["og:title"]}</p>
-                <p>{post.metadata["og:description"]}</p>
-                <p>{post.url}</p>
-              </MetadadosText>
-              <img src={post.metadata["og:image"]} alt="URL Preview" />
-            </Metadados>
-          ) : (
-            ""
-          )}
+        <p>
+          {post.description}{" "}
+          {post.hashtags.length > 0 &&
+            post.hashtags.map((hashtag, index) => (
+              <React.Fragment key={hashtag.hashtagId}>
+                <Link to={`/hashtag/${hashtag.hashtag}`}>
+                  <Tag>#{hashtag.hashtag}</Tag>
+                </Link>
+                {index !== post.hashtags.length - 1 && " "}
+              </React.Fragment>
+            ))}
+        </p>
+        {post.Metadados ? (
+          <Metadados
+            onClick={() => {
+              window.open(post.url, "_blank");
+            }}
+          >
+            <MetadadosText>
+              <p>{post.metadata["og:title"]}</p>
+              <p>{post.metadata["og:description"]}</p>
+              <p>{post.url}</p>
+            </MetadadosText>
+            <img src={post.metadata["og:image"]} alt="URL Preview" />
+          </Metadados>
+        ) : (
+          ""
+        )}
       </MainContent>
     </PostDiv>
   );
 }
 const Likes = styled.div``;
 const Tag = styled.a`
-    font-weight: 600;
-    color: #fff;
-    text-decoration: underline #171717;
-`
+  font-weight: 600;
+  color: #fff;
+  text-decoration: underline #171717;
+`;
 const IconsDiv = styled.div``;
 const Icon = styled.img``;
 const LeftContent = styled.div``;
