@@ -4,9 +4,11 @@ import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components'
 import Post from '../components/Post';
 import { UserContext } from '../Context/Context';
+import TrendingHashtags from '../components/Trending';
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
+    const [trendingHashtags, setTrendingHashtags] = useState([]);
     const [loading, setLoading] = useState(true);
     const [link, setLink] = useState('');
     const [description, setDescription] = useState('');
@@ -20,7 +22,7 @@ export default function PublishPage() {
         }
     }
 
-    const fetchPosts = () => {
+    const fetchPosts = ()=>{
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
         .then(resp =>{
             if (resp.data.length === 0) alert("There are no posts yet")
@@ -29,6 +31,16 @@ export default function PublishPage() {
         })
         .catch(error =>{
             alert("An error occured while trying to fetch the posts, please refresh the page");
+        })
+    }
+
+    const fetchTrending=()=>{
+        axios.get(`${process.env.REACT_APP_API_URI}/trending`)
+        .then(resp =>{
+            setTrendingHashtags(resp.data);
+        })
+        .catch(error =>{
+            console.log(error);
         })
     }
 
@@ -52,69 +64,78 @@ export default function PublishPage() {
 
     useEffect(()=>{
         fetchPosts();
+        fetchTrending();
     }, [])
 
 
     return (
+        <>
+        <h1>Timeline</h1>
         <PageContainer>
-            <header>Linkr</header>
-            <h1>Timeline</h1>
-            <div>
-                <h3>What are you going to share today?</h3>
-                <input 
-                    type="text" 
-                    label="Link" 
-                    value={link}
-                    onChange={e => setLink(e.target.value)} 
-                    disabled={isDisabled}
-                    placeholder="http://..."
-                    required 
-                ></input>
-                <input 
-                    type="text" 
-                    label="Descrição" 
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                    disabled={isDisabled}
-                    placeholder="Awesome article about #javascript"
-                ></input>
-                <button onClick={handlePublish}>Publish</button>
-            </div>
+            <MainContent>
+                <div>
+                    <h2>What are you going to share today?</h2>
+                    <input 
+                        type="text" 
+                        label="Link" 
+                        value={link}
+                        onChange={e => setLink(e.target.value)} 
+                        disabled={isDisabled}
+                        placeholder="http://..."
+                        required 
+                    ></input>
+                    <input 
+                        type="text" 
+                        label="Descrição" 
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        disabled={isDisabled}
+                        placeholder="Awesome article about #javascript"
+                    ></input>
+                    <button onClick={handlePublish}>Publish</button>
+                </div>
 
-            <PostsList>
-            {loading ? (
-                    <>
-                    <TailSpin color="#6A459C" height={80} width={80} />
-                    <p>Loading...</p>
-                    </>
-                ) : (
-                <>
-                    {posts.length === 0 ? (
-                        <p>There are no posts yet</p>
+                <PostsList>
+                {loading ? (
+                        <>
+                        <TailSpin color="#6A459C" height={80} width={80} />
+                        <p>Loading...</p>
+                        </>
                     ) : (
                     <>
-                        {posts.map((post) => (
-                            <Post key={post.postId} post={post} />
-                        ))}
+                        {posts.length === 0 ? (
+                            <p>There are no posts yet</p>
+                        ) : (
+                        <>
+                            {posts.map((post) => (
+                                <Post key={post.postId} post={post} />
+                            ))}
+                        </>
+                        )}
                     </>
-                    )}
-                </>
-            )}
-            </PostsList>
+                )}
+                </PostsList>
+            </MainContent>
+            <TrendingHashtags trendingHashtags={trendingHashtags}/>
         </PageContainer>
+        </>
     )
 }
 const PageContainer = styled.div`
     display: flex;
-    flex-direction: column;
+    //flex-direction: column;
     justify-content: start;
-    align-items: center;
+    align-items: start;
     padding-top: 1em;
     margin: auto;
     gap: 2em;
     min-height: 100vh;
     max-width: 100vw;
+    @media screen and (max-width: 1020px){
+        flex-direction: column;
+    }
 `;
+const MainContent = styled.div``
 const PostsList = styled.div`
     display: flex;
     flex-direction: column;
