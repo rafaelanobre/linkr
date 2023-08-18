@@ -1,29 +1,26 @@
 import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components'
 import Post from '../components/Post';
-import { UserContext } from '../Context/Context';
 import TrendingHashtags from '../components/Trending';
+import { useLocation, useParams } from 'react-router-dom';
 
-export default function PublishPage() {
+export default function HashtagPage(){
     const [posts, setPosts] = useState([]);
     const [trendingHashtags, setTrendingHashtags] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [link, setLink] = useState('');
-    const [description, setDescription] = useState('');
-    const [isDisabled, setIsDisabled] = useState(false);
 
-    const { user } = useContext(UserContext);
-    const { token } = user;
-    const config = {
-        headers: {
-            Authorization:`Bearer ${token}`
-        }
-    }
+    const {hashtag} = useParams();
+
+    let { state } = useLocation();
+    const tag = state;
 
     const fetchPosts = ()=>{
-        axios.get(`${process.env.REACT_APP_API_URI}/posts`)
+        if(!tag || !tag.id){
+            return setLoading(false);
+        }
+        axios.get(`${process.env.REACT_APP_API_URI}/hashtag/${tag.id}`)
         .then(resp =>{
             if (resp.data.length === 0) alert("There are no posts yet")
             setPosts(resp.data);
@@ -44,57 +41,16 @@ export default function PublishPage() {
         })
     }
 
-    const handlePublish = () => {
-        if (!link) return alert("Please enter a link before publishing!");
-
-        setIsDisabled(true);
-
-        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url:link, description }, config)
-            .then(resp => {
-                setLink('');
-                setDescription('');
-                setIsDisabled(false);
-                fetchPosts();
-            })
-            .catch(error => {
-                alert("An error occurred while trying to publish the post");
-                setIsDisabled(false);
-            });
-    };
-
     useEffect(()=>{
         fetchPosts();
         fetchTrending();
-    }, [])
+    }, [tag])
 
-
-    return (
+    return(
         <>
-        <h1>Timeline</h1>
+        <h1>{tag ? `#${tag.hashtag}` : `#${hashtag}`}</h1>
         <PageContainer>
             <MainContent>
-                <div>
-                    <h2>What are you going to share today?</h2>
-                    <input 
-                        type="text" 
-                        label="Link" 
-                        value={link}
-                        onChange={e => setLink(e.target.value)} 
-                        disabled={isDisabled}
-                        placeholder="http://..."
-                        required 
-                    ></input>
-                    <input 
-                        type="text" 
-                        label="Descrição" 
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
-                        disabled={isDisabled}
-                        placeholder="Awesome article about #javascript"
-                    ></input>
-                    <button onClick={handlePublish}>Publish</button>
-                </div>
-
                 <PostsList>
                 {loading ? (
                         <>
@@ -104,7 +60,7 @@ export default function PublishPage() {
                     ) : (
                     <>
                         {posts.length === 0 ? (
-                            <p>There are no posts yet</p>
+                            <p>There are no posts with this hashtag yet</p>
                         ) : (
                         <>
                             {posts.map((post) => (
@@ -121,6 +77,7 @@ export default function PublishPage() {
         </>
     )
 }
+
 const PageContainer = styled.div`
     display: flex;
     //flex-direction: column;
