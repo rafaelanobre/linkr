@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components'
 import Post from '../components/Post';
+import Header from '../components/Header';
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -53,7 +54,7 @@ export default function PublishPage() {
 
     return (
         <PageContainer>
-            <header>Linkr</header>
+            <Header />
             <h1>Timeline</h1>
             <div>
                 <h3>What are you going to share today?</h3>

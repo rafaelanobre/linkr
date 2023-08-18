@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components'; // Retirei os {} da importação
 import { likeIcon, likedIcon, editIcon, deleteIcon } from '../images/IconsIndex';
+import { Link } from 'react-router-dom';
 
 export default function Post({ post }){
     const metadata = post.metadata || {};
@@ -14,7 +15,7 @@ export default function Post({ post }){
             </LeftContent>
             <MainContent>
                 <div>
-                    <h5>{post.userName}</h5>
+                    <h5><Link to={`/user/${post.userId}`}>{post.userName}</Link></h5>
                     <IconsDiv>
                         <Icon src={editIcon} alt='Editar' />
                         <Icon src={deleteIcon} alt='Deletar' />
