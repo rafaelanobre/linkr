@@ -34,8 +34,8 @@ export default function SignInPage() {
       navigate('/timeline')
     })
     cadastro.catch(erro => {
-      console.log(erro.response.data)
-      alert(erro.response.data);
+      console.log(erro.response)
+      alert(erro.response);
       setBtstats(false)
 
     })
