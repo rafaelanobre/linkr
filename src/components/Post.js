@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
-import {
-  likeIcon,
-  likedIcon,
-  editIcon,
-  deleteIcon,
-} from "../images/IconsIndex";
+import { likeIcon, likedIcon, editIcon, deleteIcon,} from "../images/IconsIndex";
+import { Link } from "react-router-dom";
+import Deletepostmodal from './Deletepostmodal';
 import postservices from "../services/post.service";
 import { useContext } from "react";
 import { UserContext } from "../Context/Context";
 import { Tooltip as ReactTooltip } from "react-tooltip";
-import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import Deletepostmodal from './Deletepostmodal';
 
 export default function Post({ post }) {
+  const metadata = post.metadata || {};
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const { user } = useContext(UserContext);
   const [names, setNames] = useState(post.usersLikedNames);
   const [likes, setLikes] = useState(
@@ -92,6 +91,7 @@ export default function Post({ post }) {
 
   return (
     <PostDiv>
+      <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
       <LeftContent>
         <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
 
@@ -135,7 +135,7 @@ export default function Post({ post }) {
           <h5>{post.userName}</h5>
           <IconsDiv>
             <Icon src={editIcon} alt="Editar" />
-            <Icon src={deleteIcon} alt="Deletar" />
+            <Icon onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
           </IconsDiv>
         </div>
         <p>
@@ -157,11 +157,11 @@ export default function Post({ post }) {
             }}
           >
             <MetadadosText>
-              <p>{post.metadata["og:title"]}</p>
-              <p>{post.metadata["og:description"]}</p>
-              <p>{post.url}</p>
+            <p>{metadata['og:title']}</p>
+            <p>{metadata['og:description']}</p>
+            <p>{post.url}</p>
             </MetadadosText>
-            <img src={post.metadata["og:image"]} alt="URL Preview" />
+            <img src={metadata['og:image']} alt='URL Preview' />
           </Metadados>
         ) : (
           ""

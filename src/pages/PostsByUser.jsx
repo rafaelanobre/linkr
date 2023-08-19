@@ -31,29 +31,27 @@ export default function PostByUser() {
             <PageContainer>
                 <header>Linkr</header>
                 {loading ? <h1>Carregando posts do usuário...</h1> : <h1>{posts[0]?.userName}'s posts</h1>}
-
-
-
                 <PostsList>
-                    {loading ? (
+                {loading ? (
                         <>
-                            <TailSpin color="#6A459C" height={80} width={80} />
-                            <p>Loading...</p>
+                        <TailSpin color="#6A459C" height={80} width={80} />
+                        <p>Loading...</p>
                         </>
                     ) : (
+                    <>
+                        {posts.length === 0 ? (
+                            <p>There are no posts yet</p>
+                        ) : (
                         <>
-                            {posts.length === 0 ? (
-                                <p>There are no posts yet</p>
-                            ) : (
-                                <>
-                                    {posts.map((post) => (
-                                        <Post key={post.postId} post={post} />
-                                    ))}
-                                </>
-                            )}
+                            {posts.map((post) => (
+                                <Post key={post.postId} post={post} />
+                            ))}
                         </>
-                    )}
+                        )}
+                    </>
+                )}
                 </PostsList>
+
             </PageContainer>
         </All>
     )
@@ -81,6 +79,9 @@ const PageContainer = styled.div`
         font-style: normal;
         font-weight: 700;
         line-height: normal;
+    }
+    @media screen and (max-width: 1020px){
+        flex-direction: column;
     }
 `;
 const PostsList = styled.div`
