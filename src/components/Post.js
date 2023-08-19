@@ -8,7 +8,6 @@ import { useContext } from "react";
 import { UserContext } from "../Context/Context";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { useEffect } from "react";
-import Deletepostmodal from './Deletepostmodal';
 
 export default function Post({ post }) {
   const metadata = post.metadata || {};
