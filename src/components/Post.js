@@ -75,7 +75,7 @@ export default function Post({ post }) {
           const altername = formatNames(nameDelete)
           setshowName(altername)
         })
-        .catch((err) => console.log(err.response.data));
+        .catch((err) => console.log(err.response  ));
     } else {
       postservices
         .likepost(body)
@@ -86,7 +86,7 @@ export default function Post({ post }) {
           const altername = formatNames(newName)
           setshowName(altername)
         })
-        .catch((err) => console.log(err.response.data));
+        .catch((err) => console.log(err.response));
     }
    }
 
