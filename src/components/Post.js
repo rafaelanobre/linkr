@@ -7,7 +7,7 @@ export default function Post({ post }){
     const metadata = post.metadata || {};
 
     return (
-        <PostDiv>
+        <PostDiv data-test="post">
             <LeftContent>
                 <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
                 <Icon src={likeIcon} alt='Curtir' />
@@ -27,7 +27,7 @@ export default function Post({ post }){
                         post.hashtags.map((hashtag, index) => (
                         <React.Fragment key={hashtag.hashtagId}>
                             <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
-                                <Tag>#{hashtag.hashtag}</Tag>
+                                #{hashtag.hashtag}
                             </Link>
                             {index !== post.hashtags.length - 1 && ' '}
                         </React.Fragment>
@@ -47,11 +47,7 @@ export default function Post({ post }){
         </PostDiv>
     );
 };
-const Tag = styled.a`
-    font-weight: 600;
-    color: #fff;
-    text-decoration: underline #171717;
-`
+
 const IconsDiv = styled.div``;
 const Icon = styled.img``;
 const LeftContent = styled.div``;
@@ -146,6 +142,11 @@ const PostDiv = styled.div`
         }
         p{
             color: #B7B7B7;
+        }
+        a{
+            font-weight: 600;
+            color: #fff;
+            text-decoration: underline #171717;
         }
     }
 

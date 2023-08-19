@@ -73,9 +73,10 @@ export default function PublishPage() {
         <h1>Timeline</h1>
         <PageContainer>
             <MainContent>
-                <div>
+                <div data-test="publish-box">
                     <h2>What are you going to share today?</h2>
                     <input 
+                        data-test="link"
                         type="text" 
                         label="Link" 
                         value={link}
@@ -85,6 +86,7 @@ export default function PublishPage() {
                         required 
                     ></input>
                     <input 
+                        data-test="description"
                         type="text" 
                         label="Descrição" 
                         value={description}
@@ -92,23 +94,23 @@ export default function PublishPage() {
                         disabled={isDisabled}
                         placeholder="Awesome article about #javascript"
                     ></input>
-                    <button onClick={handlePublish}>Publish</button>
+                    <button data-test="publish-btn" onClick={handlePublish}>Publish</button>
                 </div>
 
                 <PostsList>
                 {loading ? (
                         <>
                         <TailSpin color="#6A459C" height={80} width={80} />
-                        <p>Loading...</p>
+                        <Alert>Loading...</Alert>
                         </>
                     ) : (
                     <>
                         {posts.length === 0 ? (
-                            <p>There are no posts yet</p>
+                            <Alert>There are no posts yet</Alert>
                         ) : (
                         <>
                             {posts.map((post) => (
-                                <Post key={post.postId} post={post} />
+                                <Post key={post.postId} post={post}/>
                             ))}
                         </>
                         )}
@@ -121,6 +123,7 @@ export default function PublishPage() {
         </>
     )
 }
+const Alert = styled.p``
 const PageContainer = styled.div`
     display: flex;
     //flex-direction: column;
@@ -142,6 +145,7 @@ const PostsList = styled.div`
     align-items: center;
     gap: 1em;
     padding-top: 2em;
+    
 
     @media screen and (max-width: 768px) {
         width: 100vw;

@@ -55,12 +55,12 @@ export default function HashtagPage(){
                 {loading ? (
                         <>
                         <TailSpin color="#6A459C" height={80} width={80} />
-                        <p>Loading...</p>
+                        <Alert>Loading...</Alert>
                         </>
                     ) : (
                     <>
                         {posts.length === 0 ? (
-                            <p>There are no posts with this hashtag yet</p>
+                            <Alert>There are no posts with this hashtag yet</Alert>
                         ) : (
                         <>
                             {posts.map((post) => (
@@ -77,7 +77,7 @@ export default function HashtagPage(){
         </>
     )
 }
-
+const Alert = styled.p``
 const PageContainer = styled.div`
     display: flex;
     //flex-direction: column;
@@ -99,6 +99,10 @@ const PostsList = styled.div`
     align-items: center;
     gap: 1em;
     padding-top: 2em;
+    ${Alert}{
+        font-family: Oswald;
+        font-size: 24px;
+    }
 
     @media screen and (max-width: 768px) {
         width: 100vw;
