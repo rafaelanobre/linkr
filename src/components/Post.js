@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components'; // Retirei os {} da importação
 import { likeIcon, likedIcon, editIcon, deleteIcon } from '../images/IconsIndex';
-import { Link } from'react-router-dom';
+import { Link } from 'react-router-dom';
+import Deletepostmodal from './Deletepostmodal';
 
-export default function Post({ post }){
+export default function Post({ post }) {
     const metadata = post.metadata || {};
+    const [openDeleteModal, setOpenDeleteModal] = useState(false)
 
     return (
+        
         <PostDiv>
+            <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
             <LeftContent>
                 <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
                 <Icon src={likeIcon} alt='Curtir' />
@@ -18,30 +22,31 @@ export default function Post({ post }){
                     <h5>{post.userName}</h5>
                     <IconsDiv>
                         <Icon src={editIcon} alt='Editar' />
-                        <Icon src={deleteIcon} alt='Deletar' />
+                        <Icon onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
+                        
                     </IconsDiv>
                 </div>
                 <p>
                     {post.description}{' '}
                     {post.hashtags.length > 0 &&
                         post.hashtags.map((hashtag, index) => (
-                        <React.Fragment key={hashtag.hashtagId}>
-                            <Link to={`/hashtag/${hashtag.hashtag}`}>
-                                <Tag>#{hashtag.hashtag}</Tag>
-                            </Link>
-                            {index !== post.hashtags.length - 1 && ' '}
-                        </React.Fragment>
+                            <React.Fragment key={hashtag.hashtagId}>
+                                <Link to={`/hashtag/${hashtag.hashtag}`}>
+                                    <Tag>#{hashtag.hashtag}</Tag>
+                                </Link>
+                                {index !== post.hashtags.length - 1 && ' '}
+                            </React.Fragment>
                         ))}
                 </p>
                 <Metadados onClick={() => {
                     window.open(post.url, '_blank')
                 }}>
                     <MetadadosText>
-                        <p>{metadata['og:title']}</p> 
-                        <p>{metadata['og:description']}</p> 
+                        <p>{metadata['og:title']}</p>
+                        <p>{metadata['og:description']}</p>
                         <p>{post.url}</p>
                     </MetadadosText>
-                    <img src={metadata['og:image']} alt='URL Preview' /> 
+                    <img src={metadata['og:image']} alt='URL Preview' />
                 </Metadados>
             </MainContent>
         </PostDiv>
