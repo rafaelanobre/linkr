@@ -21,20 +21,16 @@ export default function SignUpPage() {
 
     setBtstats(true);
 
-    const cadastro = axios.post(`${process.env.REACT_APP_API_URI}/sign-up`,
-      formNewUser
-    )
-    console.log(cadastro)
-    cadastro.then((x) => {
+    axios.post(`${process.env.REACT_APP_API_URI}/sign-up`, formNewUser)
+    .then((x) => {
       setBtstats(false)
       console.log(x.data)
       navigate('/')
     })
-    cadastro.catch(erro => {
+    .catch(erro => {
       console.log(erro.response.data)
       alert(erro.response.data);
       setBtstats(false)
-
     })
 
   }

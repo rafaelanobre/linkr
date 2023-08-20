@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Post from '../components/Post';
 import TrendingHashtags from '../components/Trending';
 import { useLocation, useParams } from 'react-router-dom';
+import Header from '../components/Header';
 
 export default function HashtagPage(){
     const [posts, setPosts] = useState([]);
@@ -48,7 +49,8 @@ export default function HashtagPage(){
 
     return(
         <>
-        <h1 data-test="hashtag-title">{tag ? `#${tag.hashtag}` : `#${hashtag}`}</h1>
+        <Header />
+        <PageTitle data-test="hashtag-title">{tag ? `#${tag.hashtag}` : `#${hashtag}`}</PageTitle>
         <PageContainer>
             <MainContent>
                 <PostsList>
@@ -77,6 +79,10 @@ export default function HashtagPage(){
         </>
     )
 }
+const PageTitle = styled.h1`
+    width: 80%;
+    margin: auto;
+`
 const Alert = styled.p``
 const PageContainer = styled.div`
     display: flex;
@@ -86,6 +92,7 @@ const PageContainer = styled.div`
     padding-top: 1em;
     margin: auto;
     gap: 2em;
+    width: 80%;
     min-height: 100vh;
     max-width: 100vw;
     @media screen and (max-width: 1020px){

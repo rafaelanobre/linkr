@@ -22,22 +22,19 @@ export default function SignInPage() {
     e.preventDefault();
 
     setBtstats(true);
-    const cadastro = axios.post(`${process.env.REACT_APP_API_URI}/`,
-      formNewUser
-    )
-    
-    cadastro.then((x) => {
+
+    axios.post(`${process.env.REACT_APP_API_URI}/`, formNewUser)
+    .then((x) => {
       setBtstats(false)
       setUser(x.data)      
       const productJSON = JSON.stringify(x.data); 
       sessionStorage.setItem("User", productJSON)
       navigate('/timeline')
     })
-    cadastro.catch(erro => {
+    .catch(erro => {
       console.log(erro.response)
       alert(erro.response);
       setBtstats(false)
-
     })
 
   }
