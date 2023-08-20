@@ -6,6 +6,7 @@ import { UserContext } from "./Context/Context";
 import { useState } from "react";
 import PostByUser from "./pages/PostsByUser";
 import HashtagPage from "./pages/HashtagPage";
+import UserPage from "./pages/UserPage";
 
 
 export default function App() {
@@ -23,7 +24,8 @@ export default function App() {
             <Route path="/" element={<SignInPage />} />
             <Route path="/user/:id" element={<PostByUser />} />
             <Route path="/hashtag/:hashtag" element={<HashtagPage />} />
-          </Routes>
+            <Route path="/user/:userId" element={<UserPage />} />
+        </Routes>
         </UserContext.Provider>
       </BrowserRouter>
     </>

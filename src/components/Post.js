@@ -124,7 +124,7 @@ export default function Post({ post }) {
             </LeftContent>
             <MainContent>
                 <div>
-                <h5 data-test="username">{post.userName}</h5>
+                <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>
                 <IconsDiv>
                     <Icon data-test="edit-btn" src={editIcon} alt="Editar" />
                     <Icon data-test="delete-btn" onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />

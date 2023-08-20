@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Post from '../components/Post';
 import { UserContext } from '../Context/Context';
 import TrendingHashtags from '../components/Trending';
+import Header from '../components/Header';
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -70,7 +71,8 @@ export default function PublishPage() {
 
     return (
         <>
-        <h1>Timeline</h1>
+        <Header />
+        <PageTitle>Timeline</PageTitle>
         <PageContainer>
             <MainContent>
                 <div data-test="publish-box">
@@ -123,6 +125,11 @@ export default function PublishPage() {
         </>
     )
 }
+const PageTitle = styled.h1`
+    width: 80%;
+    margin: auto;
+`
+
 const Alert = styled.p``
 const PageContainer = styled.div`
     display: flex;
@@ -133,6 +140,7 @@ const PageContainer = styled.div`
     margin: auto;
     gap: 2em;
     min-height: 100vh;
+    width: 80%;
     max-width: 100vw;
     @media screen and (max-width: 1020px){
         flex-direction: column;
