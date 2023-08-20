@@ -106,7 +106,7 @@ export default function PublishPage() {
                     ) : (
                     <>
                         {posts.length === 0 ? (
-                            <Alert>There are no posts yet</Alert>
+                            <Alert data-test="message">There are no posts yet</Alert>
                         ) : (
                         <>
                             {posts.map((post) => (

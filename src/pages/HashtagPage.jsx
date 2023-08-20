@@ -48,7 +48,7 @@ export default function HashtagPage(){
 
     return(
         <>
-        <h1>{tag ? `#${tag.hashtag}` : `#${hashtag}`}</h1>
+        <h1 data-test="hashtag-title">{tag ? `#${tag.hashtag}` : `#${hashtag}`}</h1>
         <PageContainer>
             <MainContent>
                 <PostsList>
