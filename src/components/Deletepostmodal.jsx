@@ -25,7 +25,7 @@ export default function Deletepostmodal({ isOpen, setOpenOption, postId }) {
         })
         p.catch(erro => {
             setLoading(false)
-            alert("it was not possible to delete")
+            alert(erro.response.data)
             setOpenOption()
         })
     }

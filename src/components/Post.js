@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { styled } from "styled-components";
 import { likeIcon, likedIcon, editIcon, deleteIcon,} from "../images/IconsIndex";
 import { Link } from "react-router-dom";
@@ -8,8 +8,9 @@ import { useContext } from "react";
 import { UserContext } from "../Context/Context";
 import {Tooltip} from "react-tooltip";
 import { useEffect } from "react";
+import axios from "axios";
 
-export default function Post({ post }) {
+export default function Post({ post,onUpdate }) {
     const metadata = post.metadata || {};
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const { user } = useContext(UserContext);
@@ -17,7 +18,63 @@ export default function Post({ post }) {
     const [likes, setLikes] = useState(
         post.usersLikedNames[0] === null ? " " : post.usersLikedNames.length
     );
-    const [showName, setshowName] = useState([])
+    const [showName, setshowName] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const editFieldRef = useRef(null);
+    const [updatedDescription, setUpdatedDescription] = useState('');
+    const [updatedHashtags, setUpdatedHashtags] = useState('');
+    const [isDisabled, setIsDisabled] = useState(false);
+
+    const { token } = user;
+    const config = {
+        headers: {
+            Authorization:`Bearer ${token}`
+        }
+    }
+
+
+    const startEditing = () => {
+        setIsDisabled(false);
+        setIsEditing(true);
+        setUpdatedDescription(post.description);
+        if (editFieldRef.current) {
+            editFieldRef.current.focus();
+        }
+    };
+
+    const cancelEditing = () => {
+        setIsEditing(false);
+    };
+
+    const saveEditing = () => {
+        console.log(updatedDescription);
+        const updatedText = `${updatedDescription} ${updatedHashtags}`.trim();
+        setIsDisabled(true);
+        axios.patch(`${process.env.REACT_APP_API_URI}/posts/${post.postId}`, {description: updatedText}, config)
+        .then((resp)=>{
+            console.log(resp.data)
+            const updatedPost = { ...post, description: resp.data.description, hashtags: resp.data.hashtags };
+            onUpdate(updatedPost);
+            setIsEditing(false);
+        })
+        .catch((error)=>{
+            console.log(error)
+            alert("Could not save changes")
+            setIsDisabled(false);
+        })
+    };
+
+    useEffect(() => {
+        if (isEditing) {
+            editFieldRef.current.focus();
+        }
+    }, [isEditing]);
+
+    useEffect(() => {
+        setUpdatedHashtags(
+            post.hashtags.map(hashtag => `#${hashtag.hashtag}`).join(' ')
+        );
+    }, [post.hashtags]);
 
     function formatNames(names) {
         if (names[1] === user.name  && names[0] === null) {
@@ -126,22 +183,52 @@ export default function Post({ post }) {
                 <div>
                 <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>
                 <IconsDiv>
-                    <Icon data-test="edit-btn" src={editIcon} alt="Editar" />
+                    <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
                     <Icon data-test="delete-btn" onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
                 </IconsDiv>
                 </div>
-                <p data-test="description">
-                {post.description}{" "}
-                {post.hashtags > 0 && post.hashtags.length > 0 &&
-                    post.hashtags.map((hashtag, index) => (
-                    <React.Fragment key={hashtag.hashtagId}>
-                        <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
-                        #{hashtag.hashtag}
-                        </Link>
-                        {index !== post.hashtags.length - 1 && " "}
-                    </React.Fragment>
-                    ))}
-                </p>
+                {isEditing ? (
+                    <textarea
+                        disabled={isDisabled}
+                        data-test="edit-input"
+                        ref={editFieldRef}
+                        value={
+                            post.hashtags.length > 0
+                                ? `${updatedDescription} ${updatedHashtags}`
+                                : updatedDescription
+                        }
+                        onChange={(e) => {
+                            const inputText = e.target.value;
+                            const hashtagsIndex = inputText.lastIndexOf('#');
+                            setUpdatedDescription(inputText.substring(0, hashtagsIndex).trim());
+                            setUpdatedHashtags(inputText.substring(hashtagsIndex).trim());
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                saveEditing();
+                            } else if (e.key === "Escape") {
+                                cancelEditing();
+                            }
+                        }}
+                    />
+                ) : (
+                    <p data-test="description">
+                        {post.hashtags.length === 0
+                            ? post.description
+                            :(<>
+                            {post.description}{" "}
+                            {post.hashtags.map((hashtag, index) => (
+                                <React.Fragment key={hashtag.hashtagId}>
+                                    <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
+                                    #{hashtag.hashtag}
+                                    </Link>
+                                    {index !== post.hashtags.length - 1 && " "}
+                                </React.Fragment>
+                            ))}
+                            </>)}
+                    </p>
+                )}
                 {post.metadata ? (
                 <Metadados
                     data-test="link"
