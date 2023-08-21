@@ -1,10 +1,18 @@
 import React from 'react';
-import styled from 'styled-components'; // Retirei os {} da importação
+import styled from 'styled-components'; 
 import { likeIcon, likedIcon, editIcon, deleteIcon } from '../images/IconsIndex';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Post({ post }){
     const metadata = post.metadata || {};
+    const navigate = useNavigate();
+
+    console.log(metadata);
+
+    const handleUserPage = (event) => {
+        event.stopPropagation();
+        navigate(`/user/${post.userId}`);
+    }
 
     return (
         <PostDiv>
@@ -15,7 +23,7 @@ export default function Post({ post }){
             </LeftContent>
             <MainContent>
                 <div>
-                    <h5><Link to={`/user/${post.userId}`}>{post.userName}</Link></h5>
+                    <h5 onClick={handleUserPage}>{post.userName}</h5>
                     <IconsDiv>
                         <Icon src={editIcon} alt='Editar' />
                         <Icon src={deleteIcon} alt='Deletar' />
