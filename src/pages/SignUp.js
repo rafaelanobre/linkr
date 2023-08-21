@@ -18,20 +18,21 @@ export default function SignUpPage() {
 
   function sendsignup(e) {
     e.preventDefault();
+    if (!formNewUser.email || !formNewUser.password || !formNewUser.name || !formNewUser.photo) {
+      alert("Please fill in all required fields.");
+      return;
+    }
 
     setBtstats(true);
 
     axios.post(`${process.env.REACT_APP_API_URI}/sign-up`, formNewUser)
-    .then((x) => {
-      setBtstats(false)
-      console.log(x.data)
-      navigate('/')
-    })
-    .catch(erro => {
-      console.log(erro.response.data)
-      alert(erro.response.data);
-      setBtstats(false)
-    })
+      .then((x) => {
+        navigate('/')
+      })
+      .catch(erro => {
+        alert(erro?.response.data);
+        setBtstats(false)
+      })
 
   }
   return (
@@ -44,8 +45,8 @@ export default function SignUpPage() {
       <SingUpContainer>
         <form onSubmit={sendsignup}>
           <input data-test="email" disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
-          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
-          <input data-test="username" disabled={btstats} placeholder="username" type="text" id="name" required value={formNewUser['name']} onChange={updateFormNewUser} />
+          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password"  value={formNewUser['password']} onChange={updateFormNewUser} />
+          <input data-test="username" disabled={btstats} placeholder="username" type="text" id="name"  value={formNewUser['name']} onChange={updateFormNewUser} />
           <input data-test="picture-url" disabled={btstats} placeholder="picture url" type="url" id="photo" value={formNewUser['photo']} onChange={updateFormNewUser} />
 
           {btstats ? <button data-test="sign-up-btn" disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button data-test="sign-up-btn" disabled={btstats} type="submit">Sign Up</button>}
