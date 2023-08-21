@@ -82,7 +82,8 @@ export default function PublishPage() {
         <PageTitle>Timeline</PageTitle>
         <PageContainer>
             <MainContent>
-                <div data-test="publish-box">
+                <NewPostDiv data-test="publish-box">
+                    <img src={user.photo} alt={`Foto de ${user.name}`} />
                     <h2>What are you going to share today?</h2>
                     <input 
                         data-test="link"
@@ -104,7 +105,7 @@ export default function PublishPage() {
                         placeholder="Awesome article about #javascript"
                     ></input>
                     <button data-test="publish-btn" onClick={handlePublish}>Publish</button>
-                </div>
+                </NewPostDiv>
 
                 <PostsList>
                 {loading ? (
@@ -135,12 +136,16 @@ export default function PublishPage() {
 const PageTitle = styled.h1`
     width: 80%;
     margin: auto;
-`
 
+    @media screen and (max-width: 768px) {
+        width: 100vw;
+        padding-left: 0.5em;
+    }
+`
+const NewPostDiv = styled.div``
 const Alert = styled.p``
 const PageContainer = styled.div`
     display: flex;
-    //flex-direction: column;
     justify-content: start;
     align-items: start;
     padding-top: 1em;
@@ -152,8 +157,62 @@ const PageContainer = styled.div`
     @media screen and (max-width: 1020px){
         flex-direction: column;
     }
+    @media screen and (max-width: 768px) {
+        width: 100vw;
+    }
 `;
-const MainContent = styled.div``
+const MainContent = styled.div`
+    ${NewPostDiv}{
+        position: relative;
+        padding: 1em;
+        padding-left: 5em;
+        border-radius: 16px;
+        background: #FFF;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        img{
+            position: absolute;
+            top: 2;
+            left: 0;
+            width: 10%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 3em;
+            margin-left: 0.75em;
+            @media screen and (max-width: 768px) {
+                width: 15%;
+            }
+        }
+
+        input{
+            padding: 0.5em;
+            border-radius: 5px;
+            background: #EFEFEF;
+            border: none;
+
+            color: #949494;
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        button{
+            cursor: pointer;
+            padding: 0.5em;
+            align-self: flex-end;
+            width: 25%;
+            border-radius: 5px;
+            background: #1877F2;
+
+            color: #FFF;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+        }
+    }
+`
 const PostsList = styled.div`
     display: flex;
     flex-direction: column;
