@@ -132,7 +132,7 @@ export default function Post({ post }) {
                 </div>
                 <p data-test="description">
                 {post.description}{" "}
-                {post.hashtags.length > 0 &&
+                {post.hashtags > 0 && post.hashtags.length > 0 &&
                     post.hashtags.map((hashtag, index) => (
                     <React.Fragment key={hashtag.hashtagId}>
                         <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>

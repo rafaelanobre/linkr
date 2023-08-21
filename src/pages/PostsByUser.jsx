@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components'
 import Post from '../components/Post';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import Header from '../components/Header';
 
 export default function PostByUser() {
     const [posts, setPosts] = useState([]);
@@ -12,7 +13,7 @@ export default function PostByUser() {
     const [link, setLink] = useState('');
     const [description, setDescription] = useState('');
     const [isDisabled, setIsDisabled] = useState(false);
-
+    const navigate = useNavigate()
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_URI}/user/${parametros.id}`)
             .then(resp => {
@@ -27,7 +28,10 @@ export default function PostByUser() {
     }, [])
 
     return (
+        <>
+        <Header/>
         <All>
+            
             <PageContainer>
                 <header>Linkr</header>
                 {loading ? <h1>Carregando posts do usuário...</h1> : <h1>{posts[0]?.userName}'s posts</h1>}
@@ -54,6 +58,7 @@ export default function PostByUser() {
 
             </PageContainer>
         </All>
+        </>
     )
 }
 
