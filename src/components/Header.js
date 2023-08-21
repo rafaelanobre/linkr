@@ -12,7 +12,7 @@ export default function Header() {
   const { user } = useContext(UserContext);
   const { photo } = user;
 
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState('');
   const [searchResult, setsearchResult] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
@@ -25,9 +25,11 @@ export default function Header() {
 
   function searchqueryForm(e){
     e.preventDefault()
-    searchquery(search)
-    .then((res) => setsearchResult(res))
-    .catch((err) => console.log(err));
+    if (search.length >= 3){
+      searchquery(search)
+      .then((res) => setsearchResult(res))
+      .catch((err) => console.log(err));
+    };
   }
 
   const handleSearchClick = () => {
@@ -40,9 +42,12 @@ export default function Header() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      searchquery(search)
+      if (search.length >= 3){
+        searchquery(search)
         .then((res) => setsearchResult(res))
         .catch((err) => console.log(err));
+      }
+     
     }, debouncetime);
 
     return () => clearTimeout(timer);
