@@ -7,9 +7,9 @@ import { ThreeDots } from "react-loader-spinner";
 import { UserContext } from '../Context/Context';
 
 export default function SignInPage() {
-  const [formNewUser, setFormNewUser] = useState({ email: '', password: ''})
+  const [formNewUser, setFormNewUser] = useState({ email: '', password: '' })
   const [btstats, setBtstats] = useState(false)
-  const {setUser}= useContext(UserContext)
+  const { setUser } = useContext(UserContext)
   const navigate = useNavigate()
 
   const updateFormNewUser = (e) => {
@@ -20,22 +20,26 @@ export default function SignInPage() {
 
   function sendsignin(e) {
     e.preventDefault();
+    if (!formNewUser.email || !formNewUser.password) {
+      alert("Please fill in all required fields.");
+      return;
+    }
 
     setBtstats(true);
 
     axios.post(`${process.env.REACT_APP_API_URI}/`, formNewUser)
-    .then((x) => {
-      setBtstats(false)
-      setUser(x.data)      
-      const productJSON = JSON.stringify(x.data); 
-      sessionStorage.setItem("User", productJSON)
-      navigate('/timeline')
-    })
-    .catch(erro => {
-      console.log(erro.response)
-      alert(erro.response);
-      setBtstats(false)
-    })
+      .then((x) => {
+        setBtstats(false)
+        setUser(x.data)
+        const productJSON = JSON.stringify(x.data);
+        sessionStorage.setItem("User", productJSON)
+        navigate('/timeline')
+      })
+      .catch(erro => {
+        console.log(erro.response)
+        alert(erro.response);
+        setBtstats(false)
+      })
 
   }
   return (
@@ -48,13 +52,13 @@ export default function SignInPage() {
       <FormContainer>
         <form onSubmit={sendsignin}>
           <input data-test="email" disabled={btstats} type="email" name="email" id="email" onChange={updateFormNewUser} value={formNewUser['email']} placeholder="E-mail" />
-          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password" required value={formNewUser['password']} onChange={updateFormNewUser} />
+          <input data-test="password" disabled={btstats} placeholder="password" id="password" type="password" value={formNewUser['password']} onChange={updateFormNewUser} />
 
           {btstats ? <button data-test="login-btn" disabled={btstats} type="submit"><ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51} /></button> : <button data-test="login-btn" disabled={btstats} type="submit">Log In</button>}
         </form>
 
         <Link data-test="sign-up-link" to={`/sign-up`}>
-        <p>First time? Create an account!</p>
+          <p>First time? Create an account!</p>
         </Link>
       </FormContainer>
 
