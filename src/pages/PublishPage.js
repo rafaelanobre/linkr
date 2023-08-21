@@ -23,6 +23,13 @@ export default function PublishPage() {
         }
     }
 
+    const handlePostUpdate = (updatedPost) => {
+        const updatedPosts = posts.map((post) =>
+            post.postId === updatedPost.postId ? updatedPost : post
+        );
+        setPosts(updatedPosts);
+    };
+
     const fetchPosts = ()=>{
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
         .then(resp =>{
@@ -112,7 +119,7 @@ export default function PublishPage() {
                         ) : (
                         <>
                             {posts.map((post) => (
-                                <Post key={post.postId} post={post}/>
+                                <Post key={post.postId} post={post} onUpdate={handlePostUpdate}/>
                             ))}
                         </>
                         )}
