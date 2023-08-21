@@ -46,8 +46,8 @@ export default function Deletepostmodal({ isOpen, setOpenOption, postId }) {
                         <h2>to delete this post?</h2>
                     </TextConfirm>
                     <OptionButton>
-                        <button onClick={setOpenOption} >No, go back</button>
-                        <button onClick={deletePost} >Yes, delete it</button>
+                        <button data-test="cancel" onClick={setOpenOption} >No, go back</button>
+                        <button data-test="confirm" onClick={deletePost} >Yes, delete it</button>
                     </OptionButton>
                     </>
                     )}

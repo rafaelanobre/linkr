@@ -4,7 +4,7 @@ import { styled } from "styled-components";
 export default function TrendingHashtags({trendingHashtags}){
 
     return(
-        <AsideContent>
+        <AsideContent data-test="trending">
             <div>
                 <h3>trending</h3>
             </div>
@@ -13,7 +13,12 @@ export default function TrendingHashtags({trendingHashtags}){
             ) : (
                 <>
                     {trendingHashtags.map((hashtag) => (
-                        <Link key={hashtag.id} to={`/hashtag/${hashtag.hashtag}`} state={ hashtag }>
+                        <Link
+                            key={hashtag.id}
+                            to={`/hashtag/${hashtag.hashtag}`}
+                            state={ hashtag }
+                            data-test="hashtag"
+                        >
                             <p>#{hashtag.hashtag}</p>
                         </Link>
                     ))}
