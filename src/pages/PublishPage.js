@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Post from '../components/Post';
 import { UserContext } from '../Context/Context';
 import TrendingHashtags from '../components/Trending';
+import Header from '../components/Header';
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -70,6 +71,7 @@ export default function PublishPage() {
 
     return (
         <>
+        <Header/>
         <h1>Timeline</h1>
         <PageContainer>
             <MainContent>
