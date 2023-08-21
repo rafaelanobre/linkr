@@ -30,7 +30,10 @@ const GlobalStyle = createGlobalStyle`
         padding-top: 1em;
     }
     h2{
-
+        color: #707070;
+        font-family: Lato;
+        font-size: 20px;
+        font-weight: 300;
     }
     h3{
         font-family: Oswald;
