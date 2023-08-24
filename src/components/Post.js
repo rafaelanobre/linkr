@@ -32,6 +32,7 @@ export default function Post({ post,onUpdate }) {
         }
     }
 
+    console.log(post)
 
     const startEditing = () => {
         setIsDisabled(false);
@@ -214,7 +215,7 @@ export default function Post({ post,onUpdate }) {
                     />
                 ) : (
                     <p data-test="description">
-                        {post.hashtags.length === 0
+                        {post.hashtags > 0 && post.hashtags.length > 0
                             ? post.description
                             :(<>
                             {post.description}{" "}
@@ -228,6 +229,7 @@ export default function Post({ post,onUpdate }) {
                             ))}
                             </>)}
                     </p>
+                    
                 )}
                 {post.metadata ? (
                 <Metadados

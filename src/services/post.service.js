@@ -15,5 +15,14 @@ function deslike(body) {
     return promisse;
   }
 
-const postservices = {likepost, deslike}
+function getUserPerfil(params){
+  const promisse = axios.get(`${process.env.REACT_APP_API_URI}/user/${params}`)
+  return promisse
+}
+
+function profileUserId(params){
+  const promisse = axios.get(`${process.env.REACT_APP_API_URI}/usersProfile/${params}`)
+  return promisse
+}
+const postservices = {likepost, deslike, getUserPerfil, profileUserId}
 export default postservices
