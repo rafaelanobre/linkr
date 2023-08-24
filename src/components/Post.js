@@ -300,6 +300,7 @@ const PostDiv = styled.div`
     border-radius: 1em;
     gap: 0.5em;
     background-color: #171717;
+    margin-top:1em;
 
     ${LeftContent} {
         max-width: 4.5em;
