@@ -21,18 +21,17 @@ export default function Repostmodal({ isOpen, setOpenOption, postId }) {
         console.log(postId)
         console.log(config)
 
-        setLoading(true)
-        const p = axios.post(`${process.env.REACT_APP_API_URI}/repost`,{postId} , config)
-        p.then((x) => {
-            setLoading(false)
-            
-            window.location.reload();
-        })
-        p.catch(erro => {
-            setLoading(false)
-            alert(erro.response.data)
-            setOpenOption()
-        })
+         setLoading(true)
+         const p = axios.post(`${process.env.REACT_APP_API_URI}/repost`,{postId} , config)
+         p.then((x) => {
+             setLoading(false)            
+             window.location.reload();
+         })
+         p.catch(erro => {
+             setLoading(false)
+             alert(erro.response.data)
+             setOpenOption()
+         })
     }
 
 
