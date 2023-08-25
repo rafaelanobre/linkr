@@ -7,6 +7,7 @@ import { UserContext } from '../Context/Context';
 import TrendingHashtags from '../components/Trending';
 import Header from '../components/Header';
 import InfiniteScroll from "react-infinite-scroller";
+import useInterval from "use-interval";
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -17,6 +18,9 @@ export default function PublishPage() {
     const [isDisabled, setIsDisabled] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [initialPosts, setInitialPosts] = useState([]);
+    const [newPostsAvailable, setNewPostsAvailable] = useState(false);
+    const [newPostsCount, setNewPostsCount] = useState(0);
     const [userFollows, setUserFollows] = useState([]);
 
     const { user } = useContext(UserContext);
@@ -35,16 +39,17 @@ export default function PublishPage() {
     };
 
     const fetchPosts = () => {
-        axios.get(`${process.env.REACT_APP_API_URI}/posts`, config)
-        .then(resp =>{
-            if (resp.data.length === 0) alert("There are no posts yet")
-            setPosts(resp.data);
-            setLoading(false);
-        })
-        .catch(error =>{
-            console.log(error);
-            alert("An error occured while trying to fetch the posts, please refresh the page");
-        })
+        axios.get(`${process.env.REACT_APP_API_URI}/posts`)
+            .then(resp => {
+                setPosts(resp.data);
+                setInitialPosts(resp.data)
+                setLoading(false);
+                setNewPostsAvailable(false);
+            })
+            .catch(error => {
+                console.log(error);
+                alert("An error occured while trying to fetch the posts, please refresh the page");
+            })
     }
 
     const fetchTrending = () => {
@@ -116,6 +121,31 @@ export default function PublishPage() {
         fetchUserFollows();
     }, [])
 
+    useInterval(async () => {
+        console.log("Checking for new posts...");
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_URI}/posts`)
+            const newPosts = res.data;
+            const confNewpost = newPosts.filter((newPost) => {
+                return !initialPosts.some(
+                    (initialPost) => initialPost.postId === newPost.postId
+                );
+            });
+
+            if (confNewpost.length > 0) {
+                //console.log(`${confNewpost.length} new posts available.`);
+
+                setNewPostsCount(confNewpost.length);
+                setNewPostsAvailable(true);
+            } else {
+               // console.log("No new posts available.");
+                setNewPostsAvailable(false);
+            }
+        } catch (error) {
+            console.error("Error checking for new posts:", error);
+        }
+    }, 15000);
+
 
     return (
         <>
@@ -147,6 +177,10 @@ export default function PublishPage() {
                         ></input>
                         <button data-test="publish-btn" onClick={handlePublish}>Publish</button>
                     </NewPostDiv>
+
+                    {newPostsAvailable && (
+                        <BTNewPost onClick={(fetchPosts)}>{newPostsCount} new posts, load more!</BTNewPost>
+                    )}
 
                     <PostsList>
                         <InfiniteScroll
@@ -208,6 +242,31 @@ const PageContainer = styled.div`
         width: 100vw;
     }
 `;
+const BTNewPost = styled.button`
+    margin-top: 20px;
+    font-family: lato;
+    font-size: 16px;
+    font-style: normal;
+    color: white;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    background-color: #1877F2;
+    height: 65px;
+    border-radius: 16px;
+    border-color: #1877F2;
+    cursor: pointer;
+    width: 100%;
+  
+    &:hover{
+    background-color: #0052CC;
+    }
+   
+
+    @media (max-width: 767px) {
+        width: calc(100vw - 45px);
+        height: 55px;
+    }
+`;
+
 const Load = styled.div`
 display:flex;
 flex-direction: column;
