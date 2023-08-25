@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import Repostmodal from "./RepostModal";
 
-export default function Post({ post, onUpdate }) {
+export default function Post({ post, onUpdate , userFollows }) {
     const metadata = post.metadata || {};
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const { user } = useContext(UserContext);
@@ -171,180 +171,189 @@ export default function Post({ post, onUpdate }) {
         const altername = formatNames(names); // Calcula o showName com base no estado atualizado
         setshowName(altername);
     }, []);
-
+    console.log(post)
+    console.log( user.id)
     return (
         <PostContainer>
-            <Repost>
+        <Repost>
                 {post.repost ?
                     (<RepostBox>
                         <Icon src={repost} alt='Repost-text' />
                         <p>Re-reposted by {user.id === post.userId ? "you" : post.userName}</p>
                     </RepostBox>) : ""}
-                <PostDiv data-test="post">
-                    <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)} />
-                    <Repostmodal disabled={post.repost} isOpen={openRepostModal} postId={post.postId} setOpenOption={() => setOpenRepostModal(!openRepostModal)} />
-                    <LeftContent>
-                    {post.repost?<img src={post.userOrigemPhoto} alt={`Foto de ${post.userOrigemPhoto}`} />:
+        <PostDiv data-test="post">
+            <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
+            <Repostmodal disabled={post.repost} isOpen={openRepostModal} postId={post.postId} setOpenOption={() => setOpenRepostModal(!openRepostModal)} />
+            <LeftContent>
+            {post.repost?<img src={post.userOrigemPhoto} alt={`Foto de ${post.userOrigemPhoto}`} />:
                     <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />}
-                        <div>
-                            <Likes>
-                                <div data-test="like-btn" onClick={() => darLike(post.postId, user.id)}>
-                                    {names.includes(user.name) ? (
-                                        <Icon
-                                            src={likedIcon}
-                                            alt="Curtir"
-                                            data-tooltip-id={post.postId}
-                                        />
-                                    ) : (
-                                        <Icon
-                                            src={likeIcon}
-                                            alt="Curtir"
-                                            data-tooltip-id={post.postId}
-                                        />
-                                    )}
-
-                                    <Tooltip
-                                        data-test="tooltip"
-                                        key={showName}
-                                        id={post.postId}
-                                        place="bottom"
-                                        content={showName}
-                                        style={{
-                                            backgroundColor: "#FFFFFF", // Cor de fundo
-                                            color: "#505050", // Cor do texto
-                                            padding: "8px", // Espaçamento interno
-                                            borderRadius: "4px", // Borda arredondada
-                                            fontSize: "12px", // Tamanho da fonte
-                                        }}
-                                    />
-                                    <p data-test="counter">{likes} likes</p>
-                                </div>
-                            </Likes>
-                            <Icon src={commentsIcon} alt="Comments" onClick={fetchComments} />
-                            <p>{post.commentCount} comments</p>
-                            <RepostI data-test="repost-btn" >
+                <div>
+                    <Likes>
+                        <div data-test="like-btn" onClick={() => darLike(post.postId, user.id)}>
+                        {names.includes(user.name) ? (
+                            <Icon
+                            src={likedIcon}
+                            alt="Curtir"
+                            data-tooltip-id={post.postId}
+                            />
+                        ) : (
+                            <Icon
+                            src={likeIcon}
+                            alt="Curtir"
+                            data-tooltip-id={post.postId}
+                            />
+                        )}
+                        
+                        <Tooltip
+                            data-test="tooltip"
+                            key={showName}
+                            id={post.postId}
+                            place="bottom"
+                            content={showName}
+                            style={{
+                            backgroundColor: "#FFFFFF", // Cor de fundo
+                            color: "#505050", // Cor do texto
+                            padding: "8px", // Espaçamento interno
+                            borderRadius: "4px", // Borda arredondada
+                            fontSize: "12px", // Tamanho da fonte
+                            }}
+                        />
+                        <p data-test="counter">{likes} likes</p>
+                        </div>
+                    </Likes>
+                    <Icon src={commentsIcon} alt="Comments" data-test="comment-btn" onClick={fetchComments}/>
+                    <p data-test="comment-counter">{post.commentCount} comments</p>
+                    <RepostI data-test="repost-btn" >
                                 <Icon onClick={() => setOpenRepostModal(true)} src={repost} alt='Repost' />
                                 <p data-test="repost-counter">{post.repost ? post.countp : post.countp} re-post</p>
                             </RepostI>
-                        </div>
-                    </LeftContent>
-                    <MainContent>
-                        <div>
-                        {post.repost?<Link to={`/user/${post.userOrigemId}`}><h5 data-test="username">{post.userOrigemName}</h5></Link>:
+                </div>
+            </LeftContent>
+            <MainContent>
+                <div>
+                {post.repost?<Link to={`/user/${post.userOrigemId}`}><h5 data-test="username">{post.userOrigemName}</h5></Link>:
                         <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>}
-                            <IconsDiv>
-                                <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
-                                <Icon data-test="delete-btn" onClick={() => setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
-                            </IconsDiv>
-                        </div>
-                        {isEditing ? (
-                            <textarea
-                                disabled={isDisabled}
-                                data-test="edit-input"
-                                ref={editFieldRef}
-                                value={
-                                    post.hashtags.length > 0
-                                        ? `${updatedDescription} ${updatedHashtags}`
-                                        : updatedDescription
-                                }
-                                onChange={(e) => {
-                                    const inputText = e.target.value;
-                                    const hashtagsIndex = inputText.lastIndexOf('#');
-                                    setUpdatedDescription(inputText.substring(0, hashtagsIndex).trim());
-                                    setUpdatedHashtags(inputText.substring(hashtagsIndex).trim());
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        saveEditing();
-                                    } else if (e.key === "Escape") {
-                                        cancelEditing();
-                                    }
-                                }}
-                            />
-                        ) : (
-                            <p data-test="description">
-                                {post.hashtags > 0 && post.hashtags.length > 0
-                                    ? post.description
-                                    : (<>
-                                        {post.description}{" "}
-                                        {post.hashtags.map((hashtag, index) => (
-                                            <React.Fragment key={hashtag.hashtagId}>
-                                                <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
-                                                    #{hashtag.hashtag}
-                                                </Link>
-                                                {index !== post.hashtags.length - 1 && " "}
-                                            </React.Fragment>
-                                        ))}
-                                    </>)}
-                            </p>
-
-                        )}
-                        {post.metadata ? (
-                            <Metadados
-                                data-test="link"
-                                onClick={() => {
-                                    window.open(post.url, "_blank");
-                                }}
-                            >
-                                <MetadadosText>
-                                    <p>{metadata.title}</p>
-                                    <p>{metadata.description}</p>
-                                    <p>{post.url}</p>
-                                </MetadadosText>
-                                <img src={metadata.image} alt='URL Preview' />
-                            </Metadados>
-                        ) : (
-                            ""
-                        )}
-                    </MainContent>
-
-                </PostDiv>
-                {showComments ? (
-                    <CommentsContainer>
-                        {comments.length === 0 ? (
-                            <>
-                                <p>There are no comments yet</p>
-                            </>
-                        ) : (
-                            <>
-                                {comments.map((comment) => (
-                                    <Comment key={comment.id}>
-                                        <img src={comment.userPhoto} />
-                                        <div>
-                                            <h6>
-                                                <b>{comment.userName}</b>
-                                                {post.userId === comment.createdBy ? " • post's author" : null}
-                                            </h6>
-                                            <p>{comment.comment}</p>
-                                        </div>
-                                    </Comment>
-                                ))}
-
-                            </>
-                        )}
-                        <CommentInput>
-                            <img src={user.photo} alt="Your profile picture" />
-                            <input
-                                placeholder="write a comment..."
-                                value={comment}
-                                onChange={(e) => setMyComment(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        postComment()
-                                    }
-                                }}
-                            />
-                            <Icon src={postCommentIcon} alt="Post your comment" onClick={postComment} />
-                        </CommentInput>
-                    </CommentsContainer>
+                <IconsDiv>
+                {post.userId === user.id ? (
+                        <>
+                        <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
+                        <Icon data-test="delete-btn" onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
+                        </>
+                    ):''}
+                </IconsDiv>
+                </div>
+                {isEditing ? (
+                    <textarea
+                        disabled={isDisabled}
+                        data-test="edit-input"
+                        ref={editFieldRef}
+                        value={
+                            post.hashtags.length > 0
+                                ? `${updatedDescription} ${updatedHashtags}`
+                                : updatedDescription
+                        }
+                        onChange={(e) => {
+                            const inputText = e.target.value;
+                            const hashtagsIndex = inputText.lastIndexOf('#');
+                            setUpdatedDescription(inputText.substring(0, hashtagsIndex).trim());
+                            setUpdatedHashtags(inputText.substring(hashtagsIndex).trim());
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                saveEditing();
+                            } else if (e.key === "Escape") {
+                                cancelEditing();
+                            }
+                        }}
+                    />
                 ) : (
-                    <>
-                    </>
+                    <p data-test="description">
+                        {post.hashtags > 0 && post.hashtags.length > 0
+                            ? post.description
+                            :(<>
+                            {post.description}{" "}
+                            {post.hashtags.map((hashtag, index) => (
+                                <React.Fragment key={hashtag.hashtagId}>
+                                    <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
+                                    #{hashtag.hashtag}
+                                    </Link>
+                                    {index !== post.hashtags.length - 1 && " "}
+                                </React.Fragment>
+                            ))}
+                            </>)}
+                    </p>
+                    
                 )}
-            </Repost>    
-        </PostContainer>
+                {post.metadata ? (
+                <Metadados
+                    data-test="link"
+                    onClick={() => {
+                    window.open(post.url, "_blank");
+                    }}
+                >
+                    <MetadadosText>
+                    <p>{metadata.title}</p>
+                    <p>{metadata.description}</p>
+                    <p>{post.url}</p>
+                    </MetadadosText>
+                    <img src={metadata.image} alt='URL Preview' />
+                </Metadados>
+                ) : (
+                ""
+                )}
+            </MainContent>
+            
+        </PostDiv>
+        {showComments ? (
+            <CommentsContainer data-test="comment-box">
+                {comments.length === 0 ? (
+                        <>
+                            <p>There are no comments yet</p>
+                        </>
+                    ) : (
+                    <>
+                        {comments.map((comment) => (
+                            <Comment key={comment.id} data-test="comment">
+                                <img src={comment.userPhoto} />
+                                <div>
+                                    <h6>
+                                        <b>{comment.userName}</b>
+                                        {post.userId === comment.createdBy
+                                        ? " • post's author"
+                                        : userFollows.includes(comment.createdBy)
+                                        ? " • following"
+                                        : null}
+                                    </h6>
+                                    <p>{comment.comment}</p>
+                                </div>
+                            </Comment>
+                        ))}
+                        
+                    </>
+                    )}
+                <CommentInput>
+                    <img src={user.photo} alt="Your profile picture"/>
+                    <input
+                        data-test="comment-input"
+                        placeholder="write a comment..."
+                        value={comment}
+                        onChange={(e) => setMyComment(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                postComment()
+                            }
+                        }}
+                    />
+                    <Icon src={postCommentIcon} alt="Post your comment" data-test="comment-submit" onClick={postComment}/>
+                </CommentInput>
+            </CommentsContainer>
+        ) : (
+            <>
+            </>
+        )}
+    </PostContainer>
     );
 }
 
@@ -494,7 +503,7 @@ const Metadados = styled.div`
     }
 `;
 const PostDiv = styled.div`
-    position: relative;
+
     z-index: 10;
     display: flex;
     flex-direction: row;
