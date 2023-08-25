@@ -6,12 +6,16 @@ import { styled } from "styled-components";
 import Follow from "../components/follow";
 import { TailSpin } from "react-loader-spinner";
 import Post from "../components/Post";
+import axios from "axios";
+import InfiniteScroll from "react-infinite-scroller";
 
 export default function UserPage() {
   const { userId } = useParams();
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState("");
   const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     const req = async () => {
@@ -35,37 +39,64 @@ export default function UserPage() {
     req();
   }, [userId]);
 
+  function loadPage(page) {
+    if (!loading) {
+      setLoading(true);
+      const page = currentPage + 1;
+      const offset = (page - 1) * 10;
+      axios.get(`${process.env.REACT_APP_API_URI}/user/${userId}?offset=${offset}`)
+        .then((res) => {
+          const newPosts = res.data;
+          if (newPosts.length === 0) {
+            setHasMore(false);
+          } else {
+            setPosts([...posts, ...newPosts]);
+            setCurrentPage(page);
+          }
+        })
+        .catch((err) => {
+          console.error('Error fetching posts:', err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }
+
   return (
     <div>
       <Header />
       <ContainerHeader>
         <img src={profile.photo} alt="" />
-          <h1>{profile.name}'s posts</h1>
+        <h1>{profile.name}'s posts</h1>
         <Follow id={userId}></Follow>
       </ContainerHeader>
       <PostsList>
-        {loading ? (
-          <>
-            <p>Usuário ainda não tem nenhum post</p>
-          </>
-        ) : (
-          <>
-            {posts.length === 0 ? (
-              <p>There are no posts yet</p>
-            ) : (
-              <>
-                {posts.map((post) => (
-                  <Post key={post.postId} post={post} />
-                ))}
-              </>
-            )}
-          </>
-        )}
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={loadPage}
+          hasMore={hasMore}
+          loader={<Load key={0}>
+            <TailSpin color="#6A459C" height={80} width={80} />
+            <Alert>Loading...</Alert>
+          </Load>}
+        >
+          {posts.length === 0 ? (
+            <Alert data-test="message">There are no posts yet</Alert>
+          ) : (
+            <>
+              {posts.map((post) => (
+                <Post key={post.postId} post={post} />
+              ))}
+            </>
+          )}
+        </InfiniteScroll>
       </PostsList>
     </div>
   );
 }
 
+const Alert = styled.p``
 const ContainerHeader = styled.div`
   display: flex;
   align-items: center;
@@ -88,3 +119,9 @@ const PostsList = styled.div`
     width: 100vw;
   }
 `;
+const Load = styled.div`
+display:flex;
+flex-direction: column;
+justify-content:center;
+align-items: center;
+`
