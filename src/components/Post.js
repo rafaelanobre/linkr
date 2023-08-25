@@ -169,11 +169,13 @@ export default function Post({ post,onUpdate, userFollows }) {
         const altername = formatNames(names); // Calcula o showName com base no estado atualizado
         setshowName(altername);
     }, []);
-
+    console.log(post)
+    console.log( user.id)
     return (
         <PostContainer>
         <PostDiv data-test="post">
-            <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
+            
+                <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
             <LeftContent>
                 <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
                 <div>
@@ -218,8 +220,13 @@ export default function Post({ post,onUpdate, userFollows }) {
                 <div>
                 <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>
                 <IconsDiv>
-                    <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
-                    <Icon data-test="delete-btn" onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
+                    
+                    {post.userId === user.id ? (
+                        <>
+                        <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
+                        <Icon data-test="delete-btn" onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
+                        </>
+                    ):''}
                 </IconsDiv>
                 </div>
                 {isEditing ? (
@@ -469,7 +476,7 @@ const Metadados = styled.div`
     }
 `;
 const PostDiv = styled.div`
-    position: relative;
+
     z-index: 10;
     display: flex;
     flex-direction: row;

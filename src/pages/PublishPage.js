@@ -179,7 +179,11 @@ export default function PublishPage() {
                     </NewPostDiv>
 
                     {newPostsAvailable && (
-                        <BTNewPost onClick={(fetchPosts)}>{newPostsCount} new posts, load more!</BTNewPost>
+                        <BTNewPost 
+                        data-test="load-btn"
+                        onClick={(fetchPosts)}>
+                        {newPostsCount} new posts, load more!
+                        </BTNewPost>
                     )}
 
                     <PostsList>

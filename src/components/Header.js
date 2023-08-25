@@ -91,6 +91,7 @@ export default function Header() {
           {searchResult.map((result) => (
             <Usernavigate
               key={result.id}
+              data-test="user-search"
               onClick={()=> handleLinkClick(result.id)}
             >
               <Result>
@@ -175,6 +176,7 @@ const SearchBar = styled.input`
   padding: 10px;
   border: none;
   border-radius: 5px 0px 0px 0px;
+  outline: none;
 `;
 
 const Result = styled.li`
