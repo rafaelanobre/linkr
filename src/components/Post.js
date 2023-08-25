@@ -10,7 +10,7 @@ import {Tooltip} from "react-tooltip";
 import { useEffect } from "react";
 import axios from "axios";
 
-export default function Post({ post,onUpdate }) {
+export default function Post({ post,onUpdate, userFollows }) {
     const metadata = post.metadata || {};
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const { user } = useContext(UserContext);
@@ -212,8 +212,8 @@ export default function Post({ post,onUpdate }) {
                         <p data-test="counter">{likes} likes</p>
                         </div>
                     </Likes>
-                    <Icon src={commentsIcon} alt="Comments" onClick={fetchComments}/>
-                    <p>{post.commentCount} comments</p>
+                    <Icon src={commentsIcon} alt="Comments" data-test="comment-btn" onClick={fetchComments}/>
+                    <p data-test="comment-counter">{post.commentCount} comments</p>
                 </div>
             </LeftContent>
             <MainContent>
@@ -293,7 +293,7 @@ export default function Post({ post,onUpdate }) {
             
         </PostDiv>
         {showComments ? (
-            <CommentsContainer>
+            <CommentsContainer data-test="comment-box">
                 {comments.length === 0 ? (
                         <>
                             <p>There are no comments yet</p>
@@ -301,12 +301,16 @@ export default function Post({ post,onUpdate }) {
                     ) : (
                     <>
                         {comments.map((comment) => (
-                            <Comment key={comment.id}>
+                            <Comment key={comment.id} data-test="comment">
                                 <img src={comment.userPhoto} />
                                 <div>
                                     <h6>
                                         <b>{comment.userName}</b>
-                                        {post.userId === comment.createdBy ? " • post's author" : null}
+                                        {post.userId === comment.createdBy
+                                        ? " • post's author"
+                                        : userFollows.includes(comment.createdBy)
+                                        ? " • following"
+                                        : null}
                                     </h6>
                                     <p>{comment.comment}</p>
                                 </div>
@@ -318,6 +322,7 @@ export default function Post({ post,onUpdate }) {
                 <CommentInput>
                     <img src={user.photo} alt="Your profile picture"/>
                     <input
+                        data-test="comment-input"
                         placeholder="write a comment..."
                         value={comment}
                         onChange={(e) => setMyComment(e.target.value)}
@@ -328,7 +333,7 @@ export default function Post({ post,onUpdate }) {
                             }
                         }}
                     />
-                    <Icon src={postCommentIcon} alt="Post your comment" onClick={postComment}/>
+                    <Icon src={postCommentIcon} alt="Post your comment" data-test="comment-submit" onClick={postComment}/>
                 </CommentInput>
             </CommentsContainer>
         ) : (
