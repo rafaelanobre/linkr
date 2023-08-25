@@ -39,7 +39,7 @@ export default function PublishPage() {
     };
 
     const fetchPosts = () => {
-        axios.get(`${process.env.REACT_APP_API_URI}/posts`)
+        axios.get(`${process.env.REACT_APP_API_URI}/posts`, config)
             .then(resp => {
                 setPosts(resp.data);
                 setInitialPosts(resp.data)
