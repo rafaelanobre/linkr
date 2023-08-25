@@ -17,6 +17,7 @@ export default function PublishPage() {
     const [isDisabled, setIsDisabled] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [userFollows, setUserFollows] = useState([]);
 
     const { user } = useContext(UserContext);
     const { token } = user;
@@ -34,7 +35,7 @@ export default function PublishPage() {
     };
 
     const fetchPosts = () => {
-        axios.get(`${process.env.REACT_APP_API_URI}/posts`)
+        axios.get(`${process.env.REACT_APP_API_URI}/posts`, config)
         .then(resp =>{
             if (resp.data.length === 0) alert("There are no posts yet")
             setPosts(resp.data);
@@ -50,6 +51,16 @@ export default function PublishPage() {
         axios.get(`${process.env.REACT_APP_API_URI}/trending`)
             .then(resp => {
                 setTrendingHashtags(resp.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
+    const fetchUserFollows = () => {
+        axios.get(`${process.env.REACT_APP_API_URI}/following`, config)
+            .then(resp => {
+                setUserFollows(resp.data);
             })
             .catch(error => {
                 console.log(error);
@@ -102,6 +113,7 @@ export default function PublishPage() {
     useEffect(() => {
         fetchPosts();
         fetchTrending();
+        fetchUserFollows();
     }, [])
 
 
@@ -147,11 +159,16 @@ export default function PublishPage() {
                             </Load>}
                         >
                             {posts.length === 0 ? (
-                                <Alert data-test="message">There are no posts yet</Alert>
+                                <Alert data-test="message">
+                                    {userFollows.length === 0
+                                        ? "You don't follow anyone yet. Search for new friends!"
+                                        : "No posts found from your friends"
+                                    }
+                                </Alert>
                             ) : (
                                 <>
                                     {posts.map((post) => (
-                                        <Post key={post.postId} post={post} onUpdate={handlePostUpdate} />
+                                        <Post key={post.postId} post={post} userFollows={userFollows} onUpdate={handlePostUpdate} />
                                     ))}
                                 </>
                             )}
