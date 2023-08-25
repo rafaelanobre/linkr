@@ -230,7 +230,8 @@ export default function Post({ post, onUpdate }) {
                     </LeftContent>
                     <MainContent>
                         <div>
-                            <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>
+                        {post.repost?<Link to={`/user/${post.userOrigemId}`}><h5 data-test="username">{post.userOrigemName}</h5></Link>:
+                        <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>}
                             <IconsDiv>
                                 <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
                                 <Icon data-test="delete-btn" onClick={() => setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
@@ -359,12 +360,16 @@ const PostContainer = styled.div`
     position: relative;
 `
 const Repost = styled.div`
+p{
+    margin-top: 3px;
+}
 background-color:#1E1E1E;
 border-radius: 1em;
+margin-top: 3px;
 `;
 const RepostI = styled.div``;
 const RepostBox = styled.div`
-margin-top: 5px;
+margin-top: 2px;
 margin-left: 13px;
 display: flex;
 `;
@@ -493,7 +498,7 @@ const PostDiv = styled.div`
     z-index: 10;
     display: flex;
     flex-direction: row;
-    padding: 1em;
+    padding: 0.5em;
     border-radius: 1em;
     gap: 0.5em;
     background-color: #171717;
