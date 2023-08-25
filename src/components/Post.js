@@ -1,16 +1,17 @@
 import React, { useRef, useState } from "react";
 import { styled } from "styled-components";
-import { likeIcon, likedIcon, editIcon, deleteIcon, commentsIcon, postCommentIcon,} from "../images/IconsIndex";
+import { likeIcon, likedIcon, editIcon, deleteIcon, commentsIcon, postCommentIcon, repost, } from "../images/IconsIndex";
 import { Link } from "react-router-dom";
 import Deletepostmodal from './Deletepostmodal';
 import postservices from "../services/post.service";
 import { useContext } from "react";
 import { UserContext } from "../Context/Context";
-import {Tooltip} from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { useEffect } from "react";
 import axios from "axios";
+import Repostmodal from "./RepostModal";
 
-export default function Post({ post,onUpdate, userFollows }) {
+export default function Post({ post, onUpdate, userFollows }) {
     const metadata = post.metadata || {};
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const { user } = useContext(UserContext);
@@ -27,11 +28,12 @@ export default function Post({ post,onUpdate, userFollows }) {
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [comment, setMyComment] = useState('');
+    const [openRepostModal, setOpenRepostModal] = useState(false)
 
     const { token } = user;
     const config = {
         headers: {
-            Authorization:`Bearer ${token}`
+            Authorization: `Bearer ${token}`
         }
     }
 
@@ -52,17 +54,17 @@ export default function Post({ post,onUpdate, userFollows }) {
         console.log(updatedDescription);
         const updatedText = `${updatedDescription} ${updatedHashtags}`.trim();
         setIsDisabled(true);
-        axios.patch(`${process.env.REACT_APP_API_URI}/posts/${post.postId}`, {description: updatedText}, config)
-        .then((resp)=>{
-            const updatedPost = { ...post, description: resp.data.description, hashtags: resp.data.hashtags };
-            onUpdate(updatedPost);
-            setIsEditing(false);
-        })
-        .catch((error)=>{
-            console.log(error)
-            alert("Could not save changes")
-            setIsDisabled(false);
-        })
+        axios.patch(`${process.env.REACT_APP_API_URI}/posts/${post.postId}`, { description: updatedText }, config)
+            .then((resp) => {
+                const updatedPost = { ...post, description: resp.data.description, hashtags: resp.data.hashtags };
+                onUpdate(updatedPost);
+                setIsEditing(false);
+            })
+            .catch((error) => {
+                console.log(error)
+                alert("Could not save changes")
+                setIsDisabled(false);
+            })
     };
 
     useEffect(() => {
@@ -73,33 +75,33 @@ export default function Post({ post,onUpdate, userFollows }) {
 
     const fetchComments = () => {
         axios.get(`${process.env.REACT_APP_API_URI}/comments/${post.postId}`)
-        .then((resp)=>{
-            console.log(resp.data)
-            setComments(resp.data);
-            setShowComments(true);
-        })
-        .catch((error)=>{
-            console.log(error)
-            alert("Error when loading comments");
-        })
-        
+            .then((resp) => {
+                console.log(resp.data)
+                setComments(resp.data);
+                setShowComments(true);
+            })
+            .catch((error) => {
+                console.log(error)
+                alert("Error when loading comments");
+            })
+
     }
 
     const postComment = () => {
-        if (comment.trim() === ""){
+        if (comment.trim() === "") {
             alert("Comment can't be empy");
             return;
         }
         axios.post(`${process.env.REACT_APP_API_URI}/comments/${post.postId}`, { comment }, config)
-        .then((resp) => {
-            const newComment = { ...resp.data, userName: user.name, userPhoto: user.photo };
-            setComments([...comments, newComment]);
-            setMyComment("");
-        })
-        .catch((error) => {
-            console.log(error);
-            alert("Could not post comment");
-        });
+            .then((resp) => {
+                const newComment = { ...resp.data, userName: user.name, userPhoto: user.photo };
+                setComments([...comments, newComment]);
+                setMyComment("");
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Could not post comment");
+            });
     };
 
     useEffect(() => {
@@ -109,7 +111,7 @@ export default function Post({ post,onUpdate, userFollows }) {
     }, [post.hashtags]);
 
     function formatNames(names) {
-        if (names[1] === user.name  && names[0] === null) {
+        if (names[1] === user.name && names[0] === null) {
             return "voce curtiu";
         }
         if (names[0] === null) {
@@ -151,196 +153,208 @@ export default function Post({ post,onUpdate, userFollows }) {
                     const altername = formatNames(nameDelete)
                     setshowName(altername)
                 })
-                .catch((err) => console.log(err.response  ));
-            } else {
-                postservices
-                    .likepost(body)
-                    .then((res) => {
-                        const newName = [...names, user.name];
-                        setNames(newName);
-                        setLikes(likes + 1);
-                        const altername = formatNames(newName)
-                        setshowName(altername)
-                    })
-                    .catch((err) => console.log(err.response));
-                }
-}
+                .catch((err) => console.log(err.response));
+        } else {
+            postservices
+                .likepost(body)
+                .then((res) => {
+                    const newName = [...names, user.name];
+                    setNames(newName);
+                    setLikes(likes + 1);
+                    const altername = formatNames(newName)
+                    setshowName(altername)
+                })
+                .catch((err) => console.log(err.response));
+        }
+    }
     useEffect(() => {
         const altername = formatNames(names); // Calcula o showName com base no estado atualizado
         setshowName(altername);
     }, []);
     console.log(post)
-    console.log( user.id)
+    console.log(user.id)
     return (
         <PostContainer>
-        <PostDiv data-test="post">
-            
-                <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
-            <LeftContent>
-                <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
-                <div>
-                    <Likes>
-                        <div data-test="like-btn" onClick={() => darLike(post.postId, user.id)}>
-                        {names.includes(user.name) ? (
-                            <Icon
-                            src={likedIcon}
-                            alt="Curtir"
-                            data-tooltip-id={post.postId}
+            <Repost>
+                {post.repost ?
+                    (<RepostBox>
+                        <Icon src={repost} alt='Repost-text' />
+                        <p>Re-reposted by {user.id === post.userId ? "you" : post.userName}</p>
+                    </RepostBox>) : ""}
+                <PostDiv data-test="post">
+                    <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)} />
+                    <Repostmodal disabled={post.repost} isOpen={openRepostModal} postId={post.postId} setOpenOption={() => setOpenRepostModal(!openRepostModal)} />
+                    <LeftContent>
+                        {post.repost ? <img src={post.userOrigemPhoto} alt={`Foto de ${post.userOrigemPhoto}`} /> :
+                            <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />}
+                        <div>
+                            <Likes>
+                                <div data-test="like-btn" onClick={() => darLike(post.postId, user.id)}>
+                                    {names.includes(user.name) ? (
+                                        <Icon
+                                            src={likedIcon}
+                                            alt="Curtir"
+                                            data-tooltip-id={post.postId}
+                                        />
+                                    ) : (
+                                        <Icon
+                                            src={likeIcon}
+                                            alt="Curtir"
+                                            data-tooltip-id={post.postId}
+                                        />
+                                    )}
+
+                                    <Tooltip
+                                        data-test="tooltip"
+                                        key={showName}
+                                        id={post.postId}
+                                        place="bottom"
+                                        content={showName}
+                                        style={{
+                                            backgroundColor: "#FFFFFF", // Cor de fundo
+                                            color: "#505050", // Cor do texto
+                                            padding: "8px", // Espaçamento interno
+                                            borderRadius: "4px", // Borda arredondada
+                                            fontSize: "12px", // Tamanho da fonte
+                                        }}
+                                    />
+                                    <p data-test="counter">{likes} likes</p>
+                                </div>
+                            </Likes>
+                            <Icon src={commentsIcon} alt="Comments" data-test="comment-btn" onClick={fetchComments} />
+                            <p data-test="comment-counter">{post.commentCount} comments</p>
+                            <RepostI data-test="repost-btn" >
+                                <Icon onClick={() => setOpenRepostModal(true)} src={repost} alt='Repost' />
+                                <p data-test="repost-counter">{post.repost ? post.countp : post.countp} re-post</p>
+                            </RepostI>
+                        </div>
+                    </LeftContent>
+                    <MainContent>
+                        <div>
+                            {post.repost ? <Link to={`/user/${post.userOrigemId}`}><h5 data-test="username">{post.userOrigemName}</h5></Link> :
+                                <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>}
+                            <IconsDiv>
+                                {post.userId === user.id ? (
+                                    <>
+                                        <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
+                                        <Icon data-test="delete-btn" onClick={() => setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
+                                    </>
+                                ) : ''}
+                            </IconsDiv>
+                        </div>
+                        {isEditing ? (
+                            <textarea
+                                disabled={isDisabled}
+                                data-test="edit-input"
+                                ref={editFieldRef}
+                                value={
+                                    post.hashtags.length > 0
+                                        ? `${updatedDescription} ${updatedHashtags}`
+                                        : updatedDescription
+                                }
+                                onChange={(e) => {
+                                    const inputText = e.target.value;
+                                    const hashtagsIndex = inputText.lastIndexOf('#');
+                                    setUpdatedDescription(inputText.substring(0, hashtagsIndex).trim());
+                                    setUpdatedHashtags(inputText.substring(hashtagsIndex).trim());
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        saveEditing();
+                                    } else if (e.key === "Escape") {
+                                        cancelEditing();
+                                    }
+                                }}
                             />
                         ) : (
-                            <Icon
-                            src={likeIcon}
-                            alt="Curtir"
-                            data-tooltip-id={post.postId}
-                            />
+                            <p data-test="description">
+                                {post.hashtags > 0 && post.hashtags.length > 0
+                                    ? post.description
+                                    : (<>
+                                        {post.description}{" "}
+                                        {post.hashtags.map((hashtag, index) => (
+                                            <React.Fragment key={hashtag.hashtagId}>
+                                                <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
+                                                    #{hashtag.hashtag}
+                                                </Link>
+                                                {index !== post.hashtags.length - 1 && " "}
+                                            </React.Fragment>
+                                        ))}
+                                    </>)}
+                            </p>
+
                         )}
-                        
-                        <Tooltip
-                            data-test="tooltip"
-                            key={showName}
-                            id={post.postId}
-                            place="bottom"
-                            content={showName}
-                            style={{
-                            backgroundColor: "#FFFFFF", // Cor de fundo
-                            color: "#505050", // Cor do texto
-                            padding: "8px", // Espaçamento interno
-                            borderRadius: "4px", // Borda arredondada
-                            fontSize: "12px", // Tamanho da fonte
-                            }}
-                        />
-                        <p data-test="counter">{likes} likes</p>
-                        </div>
-                    </Likes>
-                    <Icon src={commentsIcon} alt="Comments" data-test="comment-btn" onClick={fetchComments}/>
-                    <p data-test="comment-counter">{post.commentCount} comments</p>
-                </div>
-            </LeftContent>
-            <MainContent>
-                <div>
-                <Link to={`/user/${post.userId}`}><h5 data-test="username">{post.userName}</h5></Link>
-                <IconsDiv>
-                    
-                    {post.userId === user.id ? (
-                        <>
-                        <Icon data-test="edit-btn" src={editIcon} alt="Editar" onClick={isEditing ? saveEditing : startEditing} />
-                        <Icon data-test="delete-btn" onClick={()=> setOpenDeleteModal(true)} src={deleteIcon} alt='Deletar' />
-                        </>
-                    ):''}
-                </IconsDiv>
-                </div>
-                {isEditing ? (
-                    <textarea
-                        disabled={isDisabled}
-                        data-test="edit-input"
-                        ref={editFieldRef}
-                        value={
-                            post.hashtags.length > 0
-                                ? `${updatedDescription} ${updatedHashtags}`
-                                : updatedDescription
-                        }
-                        onChange={(e) => {
-                            const inputText = e.target.value;
-                            const hashtagsIndex = inputText.lastIndexOf('#');
-                            setUpdatedDescription(inputText.substring(0, hashtagsIndex).trim());
-                            setUpdatedHashtags(inputText.substring(hashtagsIndex).trim());
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                saveEditing();
-                            } else if (e.key === "Escape") {
-                                cancelEditing();
-                            }
-                        }}
-                    />
+                        {post.metadata ? (
+                            <Metadados
+                                data-test="link"
+                                onClick={() => {
+                                    window.open(post.url, "_blank");
+                                }}
+                            >
+                                <MetadadosText>
+                                    <p>{metadata.title}</p>
+                                    <p>{metadata.description}</p>
+                                    <p>{post.url}</p>
+                                </MetadadosText>
+                                <img src={metadata.image} alt='URL Preview' />
+                            </Metadados>
+                        ) : (
+                            ""
+                        )}
+                    </MainContent>
+
+                </PostDiv>
+                {showComments ? (
+                    <CommentsContainer data-test="comment-box">
+                        {comments.length === 0 ? (
+                            <>
+                                <p>There are no comments yet</p>
+                            </>
+                        ) : (
+                            <>
+                                {comments.map((comment) => (
+                                    <Comment key={comment.id} data-test="comment">
+                                        <img src={comment.userPhoto} />
+                                        <div>
+                                            <h6>
+                                                <b>{comment.userName}</b>
+                                                {post.userId === comment.createdBy
+                                                    ? " • post's author"
+                                                    : userFollows.includes(comment.createdBy)
+                                                        ? " • following"
+                                                        : null}
+                                            </h6>
+                                            <p>{comment.comment}</p>
+                                        </div>
+                                    </Comment>
+                                ))}
+
+                            </>
+                        )}
+                        <CommentInput>
+                            <img src={user.photo} alt="Your profile picture" />
+                            <input
+                                data-test="comment-input"
+                                placeholder="write a comment..."
+                                value={comment}
+                                onChange={(e) => setMyComment(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        postComment()
+                                    }
+                                }}
+                            />
+                            <Icon src={postCommentIcon} alt="Post your comment" data-test="comment-submit" onClick={postComment} />
+                        </CommentInput>
+                    </CommentsContainer>
                 ) : (
-                    <p data-test="description">
-                        {post.hashtags > 0 && post.hashtags.length > 0
-                            ? post.description
-                            :(<>
-                            {post.description}{" "}
-                            {post.hashtags.map((hashtag, index) => (
-                                <React.Fragment key={hashtag.hashtagId}>
-                                    <Link to={`/hashtag/${hashtag.hashtag}`} state={hashtag}>
-                                    #{hashtag.hashtag}
-                                    </Link>
-                                    {index !== post.hashtags.length - 1 && " "}
-                                </React.Fragment>
-                            ))}
-                            </>)}
-                    </p>
-                    
-                )}
-                {post.metadata ? (
-                <Metadados
-                    data-test="link"
-                    onClick={() => {
-                    window.open(post.url, "_blank");
-                    }}
-                >
-                    <MetadadosText>
-                    <p>{metadata.title}</p>
-                    <p>{metadata.description}</p>
-                    <p>{post.url}</p>
-                    </MetadadosText>
-                    <img src={metadata.image} alt='URL Preview' />
-                </Metadados>
-                ) : (
-                ""
-                )}
-            </MainContent>
-            
-        </PostDiv>
-        {showComments ? (
-            <CommentsContainer data-test="comment-box">
-                {comments.length === 0 ? (
-                        <>
-                            <p>There are no comments yet</p>
-                        </>
-                    ) : (
                     <>
-                        {comments.map((comment) => (
-                            <Comment key={comment.id} data-test="comment">
-                                <img src={comment.userPhoto} />
-                                <div>
-                                    <h6>
-                                        <b>{comment.userName}</b>
-                                        {post.userId === comment.createdBy
-                                        ? " • post's author"
-                                        : userFollows.includes(comment.createdBy)
-                                        ? " • following"
-                                        : null}
-                                    </h6>
-                                    <p>{comment.comment}</p>
-                                </div>
-                            </Comment>
-                        ))}
-                        
                     </>
-                    )}
-                <CommentInput>
-                    <img src={user.photo} alt="Your profile picture"/>
-                    <input
-                        data-test="comment-input"
-                        placeholder="write a comment..."
-                        value={comment}
-                        onChange={(e) => setMyComment(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                postComment()
-                            }
-                        }}
-                    />
-                    <Icon src={postCommentIcon} alt="Post your comment" data-test="comment-submit" onClick={postComment}/>
-                </CommentInput>
-            </CommentsContainer>
-        ) : (
-            <>
-            </>
-        )}
-    </PostContainer>
+                )}
+            </Repost>
+        </PostContainer>
     );
 }
 
@@ -355,6 +369,20 @@ const CommentInput = styled.div``
 const PostContainer = styled.div`
     position: relative;
 `
+const Repost = styled.div`
+p{
+    margin-top: 3px;
+}
+background-color:#1E1E1E;
+border-radius: 1em;
+margin-top: 3px;
+`;
+const RepostI = styled.div``;
+const RepostBox = styled.div`
+margin-top: 2px;
+margin-left: 13px;
+display: flex;
+`;
 const Comment = styled.div`
     display: flex;
     align-items: center;
@@ -480,7 +508,7 @@ const PostDiv = styled.div`
     z-index: 10;
     display: flex;
     flex-direction: row;
-    padding: 1em;
+    padding: 0.5em;
     border-radius: 1em;
     gap: 0.5em;
     background-color: #171717;
