@@ -184,7 +184,8 @@ export default function Post({ post, onUpdate }) {
                     <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)} />
                     <Repostmodal disabled={post.repost} isOpen={openRepostModal} postId={post.postId} setOpenOption={() => setOpenRepostModal(!openRepostModal)} />
                     <LeftContent>
-                        <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
+                    {post.repost?<img src={post.userOrigemPhoto} alt={`Foto de ${post.userOrigemPhoto}`} />:
+                    <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />}
                         <div>
                             <Likes>
                                 <div data-test="like-btn" onClick={() => darLike(post.postId, user.id)}>
