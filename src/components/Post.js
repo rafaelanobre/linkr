@@ -212,6 +212,10 @@ export default function Post({ post,onUpdate }) {
                     </Likes>
                     <Icon src={commentsIcon} alt="Comments" onClick={fetchComments}/>
                     <p>{post.commentCount} comments</p>
+                    <RepostI data-test="repost-btn" >
+                        <Icon onClick={() => setOpenRepostModal(true)} src={repost} alt='Repost' />
+                        <p data-test="repost-counter">{ post.repost?post.countp:post.countp} re-post</p>
+                    </RepostI>
                 </div>
             </LeftContent>
             <MainContent>
