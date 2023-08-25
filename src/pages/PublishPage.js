@@ -38,6 +38,7 @@ export default function PublishPage() {
             setLoading(false);
         })
         .catch(error =>{
+            console.log(error);
             alert("An error occured while trying to fetch the posts, please refresh the page");
         })
     }

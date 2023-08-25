@@ -176,6 +176,8 @@ const ProfileImage = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 20px;
+  aspect-ratio: 1;
+  object-fit: cover;
 `;
 
 const LogoutButton = styled.button`
