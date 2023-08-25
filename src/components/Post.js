@@ -174,6 +174,7 @@ export default function Post({ post,onUpdate }) {
         <PostContainer>
         <PostDiv data-test="post">
             <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
+            <Repostmodal disabled={post.repost} isOpen={openRepostModal} postId={post.postId} setOpenOption={() => setOpenRepostModal(!openRepostModal)} />
             <LeftContent>
                 <img src={post.userPhoto} alt={`Foto de ${post.userPhoto}`} />
                 <div>
