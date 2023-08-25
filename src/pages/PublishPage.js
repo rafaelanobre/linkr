@@ -6,6 +6,7 @@ import Post from '../components/Post';
 import { UserContext } from '../Context/Context';
 import TrendingHashtags from '../components/Trending';
 import Header from '../components/Header';
+import InfiniteScroll from "react-infinite-scroller";
 
 export default function PublishPage() {
     const [posts, setPosts] = useState([]);
@@ -14,12 +15,14 @@ export default function PublishPage() {
     const [link, setLink] = useState('');
     const [description, setDescription] = useState('');
     const [isDisabled, setIsDisabled] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const { user } = useContext(UserContext);
     const { token } = user;
     const config = {
         headers: {
-            Authorization:`Bearer ${token}`
+            Authorization: `Bearer ${token}`
         }
     }
 
@@ -30,7 +33,7 @@ export default function PublishPage() {
         setPosts(updatedPosts);
     };
 
-    const fetchPosts = ()=>{
+    const fetchPosts = () => {
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
         .then(resp =>{
             if (resp.data.length === 0) alert("There are no posts yet")
@@ -43,22 +46,47 @@ export default function PublishPage() {
         })
     }
 
-    const fetchTrending=()=>{
+    const fetchTrending = () => {
         axios.get(`${process.env.REACT_APP_API_URI}/trending`)
-        .then(resp =>{
-            setTrendingHashtags(resp.data);
-        })
-        .catch(error =>{
-            console.log(error);
-        })
+            .then(resp => {
+                setTrendingHashtags(resp.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
+
+    function loadPage(page) {
+        if (!loading) {
+            setLoading(true);
+            const page = currentPage + 1;
+            const offset = (page - 1) * 10;
+            axios.get(`${process.env.REACT_APP_API_URI}/posts?offset=${offset}`, config)
+                .then((res) => {
+                    const newPosts = res.data;
+                    if (newPosts.length === 0) {
+                        setHasMore(false);
+                    } else {
+                        setPosts([...posts, ...newPosts]);
+                        setCurrentPage(page);
+                    }
+                })
+                .catch((err) => {
+                    console.error('Error fetching posts:', err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    }
+
 
     const handlePublish = () => {
         if (!link) return alert("Please enter a link before publishing!");
 
         setIsDisabled(true);
 
-        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url:link, description }, config)
+        axios.post(`${process.env.REACT_APP_API_URI}/posts`, { url: link, description }, config)
             .then(resp => {
                 setLink('');
                 setDescription('');
@@ -71,7 +99,7 @@ export default function PublishPage() {
             });
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchPosts();
         fetchTrending();
     }, [])
@@ -79,58 +107,59 @@ export default function PublishPage() {
 
     return (
         <>
-        <Header />
-        <PageTitle>Timeline</PageTitle>
-        <PageContainer>
-            <MainContent>
-                <NewPostDiv data-test="publish-box">
-                    <img src={user.photo} alt={`Foto de ${user.name}`} />
-                    <h2>What are you going to share today?</h2>
-                    <input 
-                        data-test="link"
-                        type="text" 
-                        label="Link" 
-                        value={link}
-                        onChange={e => setLink(e.target.value)} 
-                        disabled={isDisabled}
-                        placeholder="http://..."
-                        required 
-                    ></input>
-                    <input 
-                        data-test="description"
-                        type="text" 
-                        label="Descrição" 
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
-                        disabled={isDisabled}
-                        placeholder="Awesome article about #javascript"
-                    ></input>
-                    <button data-test="publish-btn" onClick={handlePublish}>Publish</button>
-                </NewPostDiv>
+            <Header />
+            <PageTitle>Timeline</PageTitle>
+            <PageContainer>
+                <MainContent>
+                    <NewPostDiv data-test="publish-box">
+                        <img src={user.photo} alt={`Foto de ${user.name}`} />
+                        <h2>What are you going to share today?</h2>
+                        <input
+                            data-test="link"
+                            type="text"
+                            label="Link"
+                            value={link}
+                            onChange={e => setLink(e.target.value)}
+                            disabled={isDisabled}
+                            placeholder="http://..."
+                            required
+                        ></input>
+                        <input
+                            data-test="description"
+                            type="text"
+                            label="Descrição"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                            disabled={isDisabled}
+                            placeholder="Awesome article about #javascript"
+                        ></input>
+                        <button data-test="publish-btn" onClick={handlePublish}>Publish</button>
+                    </NewPostDiv>
 
-                <PostsList>
-                {loading ? (
-                        <>
-                        <TailSpin color="#6A459C" height={80} width={80} />
-                        <Alert>Loading...</Alert>
-                        </>
-                    ) : (
-                    <>
-                        {posts.length === 0 ? (
-                            <Alert data-test="message">There are no posts yet</Alert>
-                        ) : (
-                        <>
-                            {posts.map((post) => (
-                                <Post key={post.postId} post={post} onUpdate={handlePostUpdate}/>
-                            ))}
-                        </>
-                        )}
-                    </>
-                )}
-                </PostsList>
-            </MainContent>
-            <TrendingHashtags trendingHashtags={trendingHashtags}/>
-        </PageContainer>
+                    <PostsList>
+                        <InfiniteScroll
+                            pageStart={0}
+                            loadMore={loadPage}
+                            hasMore={hasMore}
+                            loader={<Load key={0}>
+                                <TailSpin color="#6A459C" height={80} width={80} />
+                                <Alert>Loading...</Alert>
+                            </Load>}
+                        >
+                            {posts.length === 0 ? (
+                                <Alert data-test="message">There are no posts yet</Alert>
+                            ) : (
+                                <>
+                                    {posts.map((post) => (
+                                        <Post key={post.postId} post={post} onUpdate={handlePostUpdate} />
+                                    ))}
+                                </>
+                            )}
+                        </InfiniteScroll>
+                    </PostsList>
+                </MainContent>
+                <TrendingHashtags trendingHashtags={trendingHashtags} />
+            </PageContainer>
         </>
     )
 }
@@ -162,6 +191,12 @@ const PageContainer = styled.div`
         width: 100vw;
     }
 `;
+const Load = styled.div`
+display:flex;
+flex-direction: column;
+justify-content:center;
+align-items: center;
+`
 const MainContent = styled.div`
     ${NewPostDiv}{
         position: relative;
@@ -220,6 +255,7 @@ const PostsList = styled.div`
     align-items: center;
     gap: 1em;
     padding-top: 2em;
+    margin-bottom:2em;
     
 
     @media screen and (max-width: 768px) {

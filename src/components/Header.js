@@ -5,6 +5,8 @@ import { UserContext } from "../Context/Context";
 import searchquery from "../services/Debounce";
 import { Link } from "react-router-dom";
 import { searchIcon } from "../images/IconsIndex";
+
+
 export default function Header() {
   const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ export default function Header() {
   const { user } = useContext(UserContext);
   const { photo } = user;
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [searchResult, setsearchResult] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
@@ -23,45 +25,59 @@ export default function Header() {
 
   const debouncetime = 300;
 
-  function searchqueryForm(e){
-    e.preventDefault()
-    if (search.length >= 3){
-      searchquery(search)
-      .then((res) => setsearchResult(res))
-      .catch((err) => console.log(err));
+  function searchqueryForm(e) {
+    e.preventDefault();
+    const params = {
+      search,
+      id: user.id,
     };
+    if (search.length >= 3) {
+      searchquery(params)
+        .then((res) => setsearchResult(res))
+        .catch((err) => console.log(err));
+    }
   }
 
   const handleSearchClick = () => {
     setShowSearchResults(!showSearchResults);
   };
-  
-  const handleLinkClick = () => {
+
+  const handleLinkClick = (props) => {
     setShowSearchResults(false);
+    setsearchResult([])
+    setSearch('')
+    navigate(`/user/${props}`)
+    
   };
 
   useEffect(() => {
+    const params = {
+      search,
+      id: user.id,
+    };
     const timer = setTimeout(() => {
-      if (search.length >= 3){
-        searchquery(search)
-        .then((res) => setsearchResult(res))
-        .catch((err) => console.log(err));
+      if (search.length >= 3) {
+        searchquery(params)
+          .then((res) => {
+            setsearchResult(res);
+          })
+          .catch((err) => console.log(err));
       }
-     
     }, debouncetime);
-
+ 
     return () => clearTimeout(timer);
-  }, [search, setSearch]);
+  }, [search]);
 
   return (
     <HeaderDiv>
-      <Logo>linkr</Logo>
+      <Logo onClick={() => navigate("/timeline")}>linkr</Logo>
       <ContainerSearch>
         <form onSubmit={searchqueryForm}>
           <SearchBar
             data-test="search"
             type="search"
             placeholder="Search for people"
+            value={search}
             onChange={(e) => setSearch(e.target.value)}
             onFocus={handleSearchClick}
             onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
@@ -73,9 +89,16 @@ export default function Header() {
 
         <ul>
           {searchResult.map((result) => (
-            <Link key={result.id} to={`/user/${result.id}`} onClick={handleLinkClick}>
-              <Result >{result.name}</Result>
-            </Link>
+            <Usernavigate
+              key={result.id}
+              onClick={()=> handleLinkClick(result.id)}
+            >
+              <Result>
+                <img src={result.photo} />
+                {result.name}
+                {result.isfollowing === true ? <h1>• following</h1> : ""}
+              </Result>
+            </Usernavigate>
           ))}
         </ul>
       </ContainerSearch>
@@ -116,12 +139,10 @@ const HeaderDiv = styled.div`
     border-radius: 0px 0px 5px 5px;
     position: absolute;
     top: 36px;
-    a {
-      text-decoration: inherit;
-    }
   }
 `;
 const Icon = styled.img``;
+const Usernavigate = styled.div``;
 
 const ContainerSearch = styled.div`
   width: 50%;
@@ -146,6 +167,7 @@ const ContainerSearch = styled.div`
 const Logo = styled.h1`
   font-family: "Arial", sans-serif;
   font-size: 24px;
+  cursor: pointer;
 `;
 
 const SearchBar = styled.input`
@@ -156,13 +178,29 @@ const SearchBar = styled.input`
 `;
 
 const Result = styled.li`
+  display: flex;
+  align-items: center;
   color: black;
   padding: 8px;
+  font-weight: 400px;
+  font-size: 19px;
   cursor: pointer;
   transition: background-color 0.2s;
   background-color: #e7e7e7;
   :hover {
     background-color: #f0f0f0;
+  }
+  img {
+    width: 39px;
+    height: 39px;
+    margin-right: 15px;
+    border-radius: 304px;
+  }
+  h1 {
+    margin-left: 10px;
+    font-size: 19px;
+    font-weight: 400;
+    color: #C5C5C5;
   }
 `;
 
