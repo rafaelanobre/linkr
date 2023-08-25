@@ -91,6 +91,7 @@ export default function Header() {
           {searchResult.map((result) => (
             <Usernavigate
               key={result.id}
+              data-test="user-search"
               onClick={()=> handleLinkClick(result.id)}
             >
               <Result>

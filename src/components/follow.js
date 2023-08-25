@@ -61,6 +61,7 @@ export default function Follow(props){
     },[props])
     return (
         <FollowContainer
+        data-test="follow-btn"
         color={followed === false? '#FFFFFF':'#1877f2'}
         background={followed === false? '#1877f2':'#FFFFFF'}
         onClick={() => !isProcessing && follower()}
