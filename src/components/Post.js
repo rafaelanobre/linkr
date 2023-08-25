@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { styled } from "styled-components";
-import { likeIcon, likedIcon, editIcon, deleteIcon,} from "../images/IconsIndex";
+import { likeIcon, likedIcon, editIcon, deleteIcon, commentsIcon, postCommentIcon,} from "../images/IconsIndex";
 import { Link } from "react-router-dom";
 import Deletepostmodal from './Deletepostmodal';
 import postservices from "../services/post.service";
@@ -24,6 +24,9 @@ export default function Post({ post,onUpdate }) {
     const [updatedDescription, setUpdatedDescription] = useState('');
     const [updatedHashtags, setUpdatedHashtags] = useState('');
     const [isDisabled, setIsDisabled] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
+    const [comment, setMyComment] = useState('');
 
     const { token } = user;
     const config = {
@@ -31,8 +34,6 @@ export default function Post({ post,onUpdate }) {
             Authorization:`Bearer ${token}`
         }
     }
-
-    console.log(post)
 
     const startEditing = () => {
         setIsDisabled(false);
@@ -53,7 +54,6 @@ export default function Post({ post,onUpdate }) {
         setIsDisabled(true);
         axios.patch(`${process.env.REACT_APP_API_URI}/posts/${post.postId}`, {description: updatedText}, config)
         .then((resp)=>{
-            console.log(resp.data)
             const updatedPost = { ...post, description: resp.data.description, hashtags: resp.data.hashtags };
             onUpdate(updatedPost);
             setIsEditing(false);
@@ -70,6 +70,37 @@ export default function Post({ post,onUpdate }) {
             editFieldRef.current.focus();
         }
     }, [isEditing]);
+
+    const fetchComments = () => {
+        axios.get(`${process.env.REACT_APP_API_URI}/comments/${post.postId}`)
+        .then((resp)=>{
+            console.log(resp.data)
+            setComments(resp.data);
+            setShowComments(true);
+        })
+        .catch((error)=>{
+            console.log(error)
+            alert("Error when loading comments");
+        })
+        
+    }
+
+    const postComment = () => {
+        if (comment.trim() === ""){
+            alert("Comment can't be empy");
+            return;
+        }
+        axios.post(`${process.env.REACT_APP_API_URI}/comments/${post.postId}`, { comment }, config)
+        .then((resp) => {
+            const newComment = { ...resp.data, userName: user.name, userPhoto: user.photo };
+            setComments([...comments, newComment]);
+            setMyComment("");
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("Could not post comment");
+        });
+    };
 
     useEffect(() => {
         setUpdatedHashtags(
@@ -140,6 +171,7 @@ export default function Post({ post,onUpdate }) {
     }, []);
 
     return (
+        <PostContainer>
         <PostDiv data-test="post">
             <Deletepostmodal isOpen={openDeleteModal} postId={post.postId} setOpenOption={() => setOpenDeleteModal(!openDeleteModal)}/>
             <LeftContent>
@@ -178,6 +210,8 @@ export default function Post({ post,onUpdate }) {
                         <p data-test="counter">{likes} likes</p>
                         </div>
                     </Likes>
+                    <Icon src={commentsIcon} alt="Comments" onClick={fetchComments}/>
+                    <p>{post.commentCount} comments</p>
                 </div>
             </LeftContent>
             <MainContent>
@@ -249,15 +283,149 @@ export default function Post({ post,onUpdate }) {
                 ""
                 )}
             </MainContent>
+            
         </PostDiv>
+        {showComments ? (
+            <CommentsContainer>
+                {comments.length === 0 ? (
+                        <>
+                            <p>There are no comments yet</p>
+                        </>
+                    ) : (
+                    <>
+                        {comments.map((comment) => (
+                            <Comment key={comment.id}>
+                                <img src={comment.userPhoto} />
+                                <div>
+                                    <h6>
+                                        <b>{comment.userName}</b>
+                                        {post.userId === comment.createdBy ? " • post's author" : null}
+                                    </h6>
+                                    <p>{comment.comment}</p>
+                                </div>
+                            </Comment>
+                        ))}
+                        
+                    </>
+                    )}
+                <CommentInput>
+                    <img src={user.photo} alt="Your profile picture"/>
+                    <input
+                        placeholder="write a comment..."
+                        value={comment}
+                        onChange={(e) => setMyComment(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                e.preventDefault();
+                                postComment()
+                            }
+                        }}
+                    />
+                    <Icon src={postCommentIcon} alt="Post your comment" onClick={postComment}/>
+                </CommentInput>
+            </CommentsContainer>
+        ) : (
+            <>
+            </>
+        )}
+    </PostContainer>
     );
 }
+
+
 const Likes = styled.div``;
 const IconsDiv = styled.div``;
 const Icon = styled.img``;
 const LeftContent = styled.div``;
 const MainContent = styled.div``;
 const MetadadosText = styled.div``;
+const CommentInput = styled.div``
+const PostContainer = styled.div`
+    position: relative;
+`
+const Comment = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 1em;
+    img{
+        width: 3em;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 3em;
+    }
+    div{
+        display: flex;
+        gap: 0.5em;
+        flex-direction: column;
+        h6{
+            color: #565656;
+            font-size: 14px;
+        }
+        h6 b{
+            color: #F3F3F3;
+            font-weight: 700;
+        }
+        p{
+            color: #ACACAC;
+            font-size: 14px;
+        }
+    }
+`
+const CommentsContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1E1E1E;
+    border-radius: 0em 0em 1em 1em;
+    padding: 1em;
+    padding-top: 2em;
+    margin-top: -1em;
+    background-blend-mode: darken;
+    gap: 1em;
+
+    ${CommentInput}{
+        width: 100%;
+        display: flex;
+        gap: 1em;
+        img{
+            width: 3em;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 3em;
+        }
+        input{
+            width: 100%;
+            border-radius: 8px;
+            background: #252525;
+            border: none;
+            padding-left: 1em;
+            color: #fff;
+            font-size: 14px;
+            font-style: normal;
+            position: relative;
+        }
+        input::placeholder{
+            color: #575757;
+            font-family: Lato;
+            font-size: 14px;
+            font-style: italic;
+            line-height: normal;
+            letter-spacing: 0.7px;
+        }
+        ${Icon}{
+            cursor: pointer;
+            width: 1.5em;
+            aspect-ratio: none;
+            border-radius: 0em;
+            position: absolute;
+            right: 2em;
+            bottom: 1.6em;
+        }
+    }
+`
+
 const Metadados = styled.div`
     cursor: pointer;
     margin-top: 0.5em;
@@ -296,6 +464,8 @@ const Metadados = styled.div`
     }
 `;
 const PostDiv = styled.div`
+    position: relative;
+    z-index: 10;
     display: flex;
     flex-direction: row;
     padding: 1em;
@@ -317,9 +487,15 @@ const PostDiv = styled.div`
             object-fit: cover;
             border-radius: 3em;
         }
+        div{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         ${Icon} {
             padding-top: 0.6em;
-            width: 70%;
+            align-self: center;
+            width: 1.5em;
             aspect-ratio: auto;
             border-radius: 0em;
             cursor: pointer;

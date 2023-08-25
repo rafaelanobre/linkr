@@ -35,14 +35,15 @@ export default function PublishPage() {
 
     const fetchPosts = () => {
         axios.get(`${process.env.REACT_APP_API_URI}/posts`)
-            .then(resp => {
-                if (resp.data.length === 0) alert("There are no posts yet")
-                setPosts(resp.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                alert("An error occured while trying to fetch the posts, please refresh the page");
-            })
+        .then(resp =>{
+            if (resp.data.length === 0) alert("There are no posts yet")
+            setPosts(resp.data);
+            setLoading(false);
+        })
+        .catch(error =>{
+            console.log(error);
+            alert("An error occured while trying to fetch the posts, please refresh the page");
+        })
     }
 
     const fetchTrending = () => {
