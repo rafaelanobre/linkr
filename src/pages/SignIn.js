@@ -163,7 +163,7 @@ font-size: 27px;
 font-weight: 700;
 line-height: 40px;
 text-align: left;
-width: 429px;
+width: calc(85% - 10px);
 height: 65px;     
 border-radius: 6px;
 border: solid 1px #1877F2;

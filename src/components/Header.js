@@ -175,6 +175,7 @@ const SearchBar = styled.input`
   padding: 10px;
   border: none;
   border-radius: 5px 0px 0px 0px;
+  outline: none;
 `;
 
 const Result = styled.li`
